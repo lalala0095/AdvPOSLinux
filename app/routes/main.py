@@ -3,6 +3,7 @@ import pandas as pd
 from app.forms.forms import AccountForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.login_required import login_required
+from app.scripts.log import event_logging
 
 main = Blueprint('main', __name__)
 
@@ -25,10 +26,6 @@ def index():
 
     return render_template("dashboard.html", title="Dashboard", total_sales=total_sales, total_products=total_products)
 
-# @main.route("/dashboard")
-# def dashboard():
-#     return render_template("dashboard.html")
-
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -45,6 +42,13 @@ def login():
             session['account_id'] = user.get('account_id', None)
 
             flash("Login successful!", "success")
+            event_logging(event_var="login",
+                        user_id=session.get('user_id'),
+                        account_id=session.get('account_id'),
+                        object_id=None,
+                        old_doc=None,
+                        new_doc=None,
+                        error=None)
             return redirect(url_for('main.index'))
         else:
             flash("Invalid username or password. Please try again.", "danger")
@@ -55,6 +59,13 @@ def login():
 def logout():
     session.clear()  # Clear all session data
     flash("You have been logged out.", "info")
+    event_logging(event_var="logout",
+                user_id=session.get('user_id'),
+                account_id=session.get('account_id'),
+                object_id=None,
+                old_doc=None,
+                new_doc=None,
+                error=None)
     return redirect(url_for('main.login'))  # Redirect to login page
 
 @main.route('/admin_signup', methods=['GET', 'POST'])
@@ -70,7 +81,7 @@ def admin_signup():
         hashed_password = generate_password_hash(form.password.data)
         count_docs = db.accounts.count_documents({})
         
-        db.accounts.insert_one({
+        new_record = {
             'account_id': count_docs,
             'username': form.username.data.strip(),
             'password': hashed_password,
@@ -78,7 +89,19 @@ def admin_signup():
             'email': form.email.data.strip().lower(),
             'subscription': form.subscription.data,
             'is_admin': True
-        })
+        }
+
+        result = db.accounts.insert_one()
+        result_id = result.inserted_id
+        new_record['_id'] = result_id
+            
+        event_logging(event_var="admin signup",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=result_id,
+                    old_doc=None,
+                    new_doc=new_record,
+                    error=None)
 
         flash("Admin account created successfully!", "success")
         return redirect(url_for('main.login'))

@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h5>Products Records</h5>
+    <h5>Cost of Goods Records</h5>
 
     <table class="table table-bordered" style="display: block;">
 
@@ -10,28 +10,34 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Product Type</th>
+                <th>Account ID</th>
+                <th>User ID</th>
+                <th>Date</th>
+                <th>Items or Description</th>
                 <th>Price</th>
-                <th>Options</th>
+                <th>Type of Goods</th>
+                <th>Remarks</th>
+                <th>Optons</th>
             </tr>
         </thead>
         <tbody>
-            {% for record in products_records %}
+            {% for cogs in cogs_records %}
             <tr>
-                <td>{{ record.product_id }}</td>
-                <td>{{ record.product_name }}</td>
-                <td>{{ record.product_type }}</td>
-                <td>${{ record.price }}</td>
+                <td>{{ cogs.account_id }}</td>
+                <td>{{ cogs.user_id }}</td>
+                <td>{{ cogs.date_of_transaction }}</td>
+                <td>{{ cogs.description }}</td>
+                <td>{{ cogs.price }}</td>
+                <td>{{ cogs.type_of_goods }}</td>
+                <td>{{ cogs.remarks }}</td>
                 <td>
                     <!-- Edit Icon -->
-                    <a href="{{ url_for('products_blueprint.products_edit', record_id=record._id) }}" class="btn btn-warning btn-sm">
+                    <a href="{{ url_for('cogs_blueprint.cogs_edit', record_id=cogs._id) }}" class="btn btn-warning btn-sm">
                         <i class="fas fa-edit"></i>
                         Edit
                     </a>
                     <!-- Delete Icon -->
-                    <form action="{{ url_for('products_blueprint.products_delete', record_id=record._id) }}" method="POST" style="display:inline;">
+                    <form action="{{ url_for('cogs_blueprint.cogs_delete', record_id=cogs._id) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
                             <i class="fas fa-trash"></i>
                             Delete
@@ -39,13 +45,10 @@
                     </form>
                 </td>
             </tr>
-            {% else %}
-            <tr>
-                <td colspan="5" class="text-center">No products records found.</td>
-            </tr>
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('products_blueprint.products_add') }}" class="btn btn-primary">Add Product</a>
 </div>
+<a href="{{ url_for('cogs_blueprint.cogs_add') }}" class="btn btn-primary">Add Cost of Goods</a>
+
 {% endblock %}

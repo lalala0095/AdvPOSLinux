@@ -55,47 +55,12 @@ def users_add():
             }
             db.users.insert_one(new_record)
             flash("users record added successfully!", "success")
+            
             return redirect(url_for('users_blueprint.users_add'))  # Stay on the same page to show updated records
 
         flash("All fields are required!", "danger")
 
     return render_template('users_add.html', form=form, users_records=users_records)
-
-
-    # db = current_app.db
-    # users_records = list(db.users.find())
-    # form = UserForm()
-
-    # if form.validate_on_submit():
-    #     # Check if the username or email already exists
-    #     existing_user = db.users.find_one({'username': form.username.data})
-    #     if existing_user:
-    #         flash("Username already exists. Please choose a different one.", "danger")
-    #         return redirect(url_for('users_blueprint.users_add'))
-    #     else:
-    #         existing_user = db.users.find_one({'username': form.username.data})
-            
-    #     # Hash the password
-    #     hashed_password = generate_password_hash(form.password.data)
-    #     is_admin = form.is_admin.data == 'True'
-    #     db_count = db['users'].count_documents({})
-    #     # Save the new account to MongoDB
-    #     db.users.insert_one({
-    #         'user_id': db_count,
-    #         'date_inserted': datetime.now(),
-    #         'account_id': session['account_id'],
-    #         'username': form.username.data.strip(),
-    #         'password': hashed_password,
-    #         'name': form.name.data.strip().title(),
-    #         'email': form.email.data.strip().lower(),
-    #         'is_admin': is_admin
-    #     })
-
-    #     flash("Account created successfully!", "success")
-    #     return redirect(url_for('main.index'))
-    # return render_template('users_add.html', form=form, users_records=users_records)
-
-
 
 # Route to delete a users record
 @users_blueprint.route('/users_delete/<string:record_id>', methods=['POST'])

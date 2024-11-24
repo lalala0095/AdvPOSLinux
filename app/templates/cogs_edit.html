@@ -4,40 +4,36 @@
 <div class="container mt-4">
     <h2>Edit Products Record</h2>
 
-    <form method="POST" action="{{ url_for('products_blueprint.products_edit', record_id=record._id) }}">
-        <input type="hidden" id="product_id" name="product_id" value="{{ record.product_id }}">
-        <div class="mb-3">
-            <label for="product_name" class="form-label">Product Name</label>
-            <input type="text" class="form-control" id="product_name" name="product_name" required>
-        </div>
-        <div class="mb-3">
-            <label for="product_name" class="form-label">Product Type</label>
-            <input type="text" class="form-control" id="product_name" name="product_name">
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ record.price }}" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{{ url_for('products_blueprint.products') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+    <div class="col-md-6 add-new-cogs">
+        <h5 class="mt-5">Add New Cost of Goods</h5>
+        
+        <form method="POST" action="{{ url_for('cogs_blueprint.cogs_edit', record_id=record._id) }}">
+            {{ form.hidden_tag() }}
+
+            {% for field in form %}
+                {% if field.name != "submit" and field.name != 'csrf_token' %}
+                    <div class="form-group">
+                        {{ field.label }}
+                        {{ field(class="form-control") }}
+                        
+                        {% if field.errors %}
+                            <div class="text-danger">
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}  <!-- submit button -->
+                <a href="{{ url_for('cogs_blueprint.cogs_records') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+            
+        </form>
+    </div>
+
 </div>
-
-<script>
-    // Function to update product details when a product is selected
-    function updateProductDetails() {
-        var productSelect = document.getElementById('product_id');
-        var selectedProduct = productSelect.options[productSelect.selectedIndex];
-        var productName = selectedProduct.getAttribute('data-product-name');
-        var productType = selectedProduct.getAttribute('data-product-type');
-        var productId = selectedProduct.getAttribute('data-product-id');
-        var productPrice = selectedProduct.getAttribute('data-price');
-
-        // Set the values in the form fields
-        document.getElementById('product_id').value = productId;
-        document.getElementById('product_name').value = productName;
-        document.getElementById('product_type').value = productType;
-        document.getElementById('price').value = productPrice;
-    }
-</script>
 {% endblock %}

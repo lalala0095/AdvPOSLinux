@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, Blueprint,
 from datetime import datetime
 from bson.objectid import ObjectId
 from app.routes.login_required import login_required
+from app.scripts.log import event_logging
 
 products_blueprint = Blueprint('products_blueprint', __name__)
 
@@ -36,8 +37,17 @@ def products_add():
                 "product_type": product_type,
                 "price": float(price),
             }
-            db.products.insert_one(new_record)
-            flash("Product record added successfully!", "success")
+            result = db.products.insert_one(new_record)
+            result_id = result.inserted_id
+            new_record['_id'] = result_id
+            flash("Product record added successfully!", "success")                
+            event_logging(event_var="products add",
+                        user_id=session.get('user_id'),
+                        account_id=session.get('account_id'),
+                        object_id=result_id,
+                        old_doc=None,
+                        new_doc=new_record,
+                        error=None)
         else:
             flash("All fields are required!", "danger")
 
@@ -54,10 +64,27 @@ def products_add():
 @login_required
 def products_delete(record_id):
     db = current_app.db
+    result = db.products.find_one({"_id": ObjectId(record_id)})
+    result_id = result['_id']
     try:
-        db.products.delete_one({"_id": ObjectId(record_id)})
-        flash("products record deleted successfully!", "success")
+        result = db.products.delete_one({"_id": ObjectId(record_id)})
+        flash("Product record deleted successfully!", "success")
+        event_logging(event_var="products delete",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=result_id,
+                    old_doc=result,
+                    new_doc=None,
+                    error=None)
+
     except Exception as e:
+        event_logging(event_var="products delete",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=result_id,
+                    old_doc=result,
+                    new_doc=result,
+                    error=e)
         flash(f"Error deleting record: {e}", "danger")
     return redirect(url_for('products_blueprint.products'))
 
@@ -90,9 +117,24 @@ def products_edit(record_id):
                 "date_updated": date_updated
             }
             try:
-                db.products.update_one({"_id": ObjectId(record_id)}, {"$set": updated_record})
+                result = db.products.update_one({"_id": ObjectId(record_id)}, {"$set": updated_record})
+                new_doc = db.products.find_one({"_id": ObjectId(record_id)})
+                event_logging(event_var="products update",
+                            user_id=session.get('user_id'),
+                            account_id=session.get('account_id'),
+                            object_id=record_id,
+                            old_doc=record,
+                            new_doc=new_doc,
+                            error=None)
                 flash("products record updated successfully!", "success")
             except Exception as e:
+                event_logging(event_var="products update",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=record_id,
+                    old_doc=record,
+                    new_doc=None,
+                    error=e)
                 flash(f"Error updating record: {e}", "danger")
             return redirect(url_for('products_blueprint.products'))
 
