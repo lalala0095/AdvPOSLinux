@@ -10,6 +10,14 @@ from app.routes.users import users_blueprint
 # Create the Flask app instance
 def create_app():
     app = Flask(__name__)
+
+    @app.template_filter('currency')
+    def format_currency(value):
+        try:
+            return f"₱{value:,.2f}"
+        except (ValueError, TypeError):
+            return "₱0.00"
+        
     app.config.from_object(Config)
 
     db = Config.db

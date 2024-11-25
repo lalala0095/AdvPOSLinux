@@ -48,6 +48,8 @@ footer {
 
 /* Form Styles */
 .form-group {
+    /* display: flex; */
+    justify-content: left;
     margin-bottom: 1rem;
 }
 
@@ -214,28 +216,13 @@ button {
 }
 
 /* Custom styles for the .col-md-6 container */
-.col-md-6 {
-    flex: 1; /* Allow both columns to take equal space */
-    max-width: 50%; /* Set max width to half the container */
-    box-sizing: border-box; /* Ensure padding doesn't add to width */
-    margin: 0; /* Remove margin between flex items */
+.col-md-6, .col-md-4 {
+    flex: 1; 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 40px;
 }
 
-table {
-    width: 100%; /* Ensures it spans the full width of the container */
-    table-layout: auto; /* Allow columns to size dynamically */
-    border-collapse: collapse; /* Optional: cleaner look */
-}
-
-th, td {
-    padding: 10px;
-    text-align: left; /* Align text to the left for better readability */
-    border-bottom: 1px solid #ddd; /* Optional: adds separation between rows */
-}
-
-th {
-    background-color: #f2f2f2; /* Highlight header row */
-}
 
 
 .row.g-3 {
@@ -244,13 +231,13 @@ th {
   
 .row {
     display: flex;
-    flex-wrap: wrap; /* Ensure wrapping for small screens */
-    gap: 2rem; /* Adjust spacing between items */
+    flex-wrap: wrap;
+    gap: 2rem;
 }
 
 
 /* Adjust Products Records styling */
-.products-records {
+.records {
     flex: 1; /* Allows it to take as much space as possible */
     min-width: 600px; /* Ensures it doesn’t shrink too much */
     width: 100%; /* Make it take the full width of the container */
@@ -258,13 +245,12 @@ th {
     border-radius: 8px;
     padding: 10px;
     background-color: white;
-    text-align: center;
     overflow-x: auto; /* Allow horizontal scroll for overflowing tables */
 }
 
 
 /* Styling for Add New Sale Form */
-.add-new-product {
+.add-new-record {
     flex: 0 0 auto; /* Prevent from shrinking */
     max-width: 400px; /* Limit size on larger screens */
     width: 100%; /* Ensure it takes up full width on smaller screens */
@@ -277,42 +263,12 @@ th {
 .container-dashboard {
     display: flex; /* Aligns items horizontally */
     flex-wrap: nowrap; /* Prevents wrapping, ensuring everything stays in a single row */
-    justify-content: flex-start; /* Distributes the cards evenly across the container */
+    justify-content: center; /* Distributes the cards evenly across the container */
     gap: 20px; /* Space between cards */
     padding: 40px; /* Add padding around the container */
     margin: 0 auto; /* Centers the container */
 }
 
-.container-products {
-    display: flex; /* Align items in a row */
-    flex-wrap: nowrap; /* Ensure no wrapping */
-    gap: 20px; /* Space between cards */
-    padding: 0; /* Remove padding within this container */
-}
-
-.container-products .card {
-    flex: 0 0 auto; /* Prevents the cards from shrinking or growing */
-    width: 250px; /* Set a specific width for the cards */
-    margin: 0; /* Remove any default margin */
-    /* Add styles for individual cards */
-    border: 1px solid #ccc; /* Border style for the cards */
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for better card visibility */
-}
-
-.container-sales .card {
-    flex: 0 0 auto; /* Prevents the cards from shrinking or growing */
-    width: 250px; /* Set a specific width for the cards */
-    margin: 0; /* Remove any default margin */
-    /* Add styles for individual cards */
-    border: 1px solid #ccc; /* Border style for the cards */
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for better card visibility */
-}
 
 .card {
     width: 100%;
@@ -345,14 +301,14 @@ th {
 
 /* Heading in the card */
 .card h3 {
-    font-size: 1.5rem;
+    font-size: small;
     margin: 0;
     padding-bottom: 10px;
 }
 
 /* Paragraph in the card */
 .card p {
-    font-size: 2rem;
+    font-size: medium;
     font-weight: bold;
     color: #333;
     margin: 0;
@@ -364,21 +320,22 @@ th {
     cursor: pointer;
 }
 
+/* 
 @media (max-width: 1200px) {
     .container-dashboard {
-        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */
+        grid-template-columns: repeat(3, 1fr); 
     }
 }
 
 @media (max-width: 768px) {
     .container-dashboard {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+        grid-template-columns: repeat(2, 1fr); 
     }
 }
 
 @media (max-width: 480px) {
     .container-dashboard {
-        grid-template-columns: 1fr; /* 1 column on very small screens */
+        grid-template-columns: 1fr; 
     }
-}
+} */
 

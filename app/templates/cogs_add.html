@@ -9,60 +9,69 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Account ID</th>
-                        <th>User ID</th>
-                        <th>Date</th>
-                        <th>Items or Description</th>
-                        <th>Price</th>
-                        <th>Type of Goods</th>
-                        <th>Remarks</th>
+                        {% if cogs_records %}
+                            {% for key in cogs_records[0].keys() %}
+                                <!-- {{ key }} -->
+                                {% if  key != "_id" and key != "date_inserted" %}
+                                    <th>{{ key.replace('_', ' ') | capitalize }}</th>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <th>No Data Available</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for cogs in cogs_records %}
-                    <tr>
-                        <td>{{ cogs.account_id }}</td>
-                        <td>{{ cogs.user_id }}</td>
-                        <td>{{ cogs.date_of_transaction }}</td>
-                        <td>{{ cogs.description }}</td>
-                        <td>{{ cogs.price }}</td>
-                        <td>{{ cogs.type_of_goods }}</td>
-                        <td>{{ cogs.remarks }}</td>
-                    </tr>
-                    {% endfor %}
+                    {% if cogs_records %}
+                        {% for cogs in cogs_records %}
+                                <tr>
+                                    {% for key, value in cogs.items() %}
+                                        {% if key != "_id" and key != "date_inserted" %}
+                                            {% if value == None %}
+                                                {% if key == "date_updated" %}
+                                                    <td>{{ value.strftime("%Y-m%-%d") }}</td>
+                                                {% endif %}
+                                            {% else %}
+                                                <td>{{ value }}</td>
+                                            {% endif %}
+                                        {% endif %}                                     
+                                    {% endfor %}
+                                </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7">No records found.</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
 
         <!-- Add Cost of Goods Form Container -->
-        <div class="col-md-6 add-new-cogs">
+        <div class="col-md-4 add-new-cogs">
             <h5 class="mt-5">Add New Cost of Goods</h5>
-            
             <form method="POST" action="{{ url_for('cogs_blueprint.cogs_add') }}">
                 {{ form.hidden_tag() }}
-
                 {% for field in form %}
                     {% if field.name != "submit" and field.name != 'csrf_token' %}
-                        <div class="form-group">
-                            {{ field.label }}
-                            {{ field(class="form-control") }}
-                            
-                            {% if field.errors %}
-                                <div class="text-danger">
-                                    {% for error in field.errors %}
-                                        <p>{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                    <div class="mb-3">    
+                        <label for="{{ field.id }}" class="form-label">{{ field.label }}</label>
+                        {{ field(class="form-control")}}
+                    </div>
+                        
+                        {% if field.errors %}
+                            <div class="text-danger">
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
-            
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-primary") }}  <!-- submit button -->
+               <!-- <div class="form-group"> -->
+                    {{ form.submit(class="btn btn-primary") }}
                     <a href="{{ url_for('cogs_blueprint.cogs_records') }}" class="btn btn-secondary">Cancel</a>
-                </div>
-                
+                <!-- </div> -->
             </form>
         </div>
     </div>

@@ -18,57 +18,61 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Adv POS</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if 'cogs_blueprint' in request.endpoint %}active{% endif %}" 
-                               href="#" id="cogsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Cost of Goods
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="cogsDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('cogs_blueprint.cogs_records') }}">View Cost of Goods</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('cogs_blueprint.cogs_add') }}">Add Cost of Goods</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if 'products_blueprint' in request.endpoint %}active{% endif %}" 
-                               href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Products
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('products_blueprint.products') }}">View Products</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('products_blueprint.products_add') }}">Add Product</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if 'sales_blueprint' in request.endpoint %}active{% endif %}" 
-                               href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Sales
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="salesDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('sales_blueprint.sales') }}">View Sales</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('sales_blueprint.sales_add') }}">Add Sale</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                {% if session.get('user_id') or session.get('account_id') %}
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">Dashboard</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {% if 'cogs_blueprint' in request.endpoint %}active{% endif %}" 
+                                href="#" id="cogsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Cost of Goods
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="cogsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('cogs_blueprint.cogs_records') }}">View Cost of Goods</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('cogs_blueprint.cogs_add') }}">Add Cost of Goods</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {% if 'products_blueprint' in request.endpoint %}active{% endif %}" 
+                                href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Products
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('products_blueprint.products') }}">View Products</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('products_blueprint.products_add') }}">Add Product</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {% if 'sales_blueprint' in request.endpoint %}active{% endif %}" 
+                                href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Sales
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="salesDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('sales_blueprint.sales') }}">View Sales</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('sales_blueprint.sales_add') }}">Add Sale</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    {% endif %}
+
+
                     <ul class="navbar-nav ms-auto">
                         {% if session.get('is_admin') %}
                         <li class="nav-item dropdown">
@@ -110,15 +114,15 @@
         </nav>
     </header>
 
-    <main class="container.fluid">
-        <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-8">
-                {% block content %}
-                {% endblock %}
-            </div>
-            <div class="col-md-2"></div>
-        </div>
+    <main class="container">
+        <!-- <div class="row justify-content-center"> -->
+            <!-- <div class="col-md-2"></div> -->
+                <div class="col-md-10">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            <!-- <div class="col-md-2"></div> -->
+        <!-- </div> -->
     </main>
   
     {% with messages = get_flashed_messages(with_categories=true) %}

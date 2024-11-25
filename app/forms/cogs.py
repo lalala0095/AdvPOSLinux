@@ -7,12 +7,15 @@ class COGsForm(FlaskForm):
     description = StringField("Items or Description", validators=[DataRequired()])
     price = FloatField("Price", validators=[DataRequired()])
     type_of_goods = SelectField("Type of Goods", choices=[
-        "Raw Materials",
-        "Packaging",
-        "Transportation Expense",
-        "Courier Service",
-        "Others"
+        ('', 'Select an option'),
+        ("Raw Materials", "Raw Materials"),
+        ("Packaging", "Packaging"),
+        ("Transportation Expense", "Transportation Expense"),
+        ("Courier Service", "Courier Service"),
+        ("Others", "Others")
     ])
+    store = StringField("Store")
+    payment_method = StringField("Payment Method")
     remarks = StringField("Remarks")
     submit = SubmitField("Submit")
 
@@ -21,11 +24,14 @@ class COGsUpdateForm(FlaskForm):
     description = StringField("Items or Description")
     price = FloatField("Price")
     type_of_goods = SelectField("Type of Goods", choices=[
-        "Raw Materials",
-        "Packaging",
-        "Transportation Expense",
-        "Courier Service",
-        "Others"
+        ('', 'Select an option'),
+        ("Raw Materials", "Raw Materials"),
+        ("Packaging", "Packaging"),
+        ("Transportation Expense", "Transportation Expense"),
+        ("Courier Service", "Courier Service"),
+        ("Others", "Others")
     ])
+    store = StringField("Store")
+    payment_method = StringField("Payment Method")
     remarks = StringField("Remarks")
     submit = SubmitField("Submit")

@@ -3,17 +3,49 @@
     <div class="container-dashboard">
         <div class="container-sales">
             <div class="card">
-                <a href=" {{ url_for('sales_blueprint.sales') }} ", class="card-link">
+                <a href=" {{ url_for('sales_blueprint.sales') }} " class="card-link">
                     <h3>Total Sales</h3>
-                    <p>${{ total_sales }}</p>    
+                    <p>{{ total_sales|currency }}</p>    
+                </a>
+            </div>
+        </div>
+        <div class="container-sales-quantity">
+            <div class="card">
+                <a href=" {{ url_for('sales_blueprint.sales') }} " class="card-link">
+                    <h3>Total Sales Count</h3>
+                    <p>{{ total_sales_quantity }}</p>    
                 </a>
             </div>
         </div>
         <div class="container-products">
             <div class="card">
-                <a href=" {{ url_for('products_blueprint.products') }} ", class="card-link">
+                <a href=" {{ url_for('products_blueprint.products') }} " class="card-link">
                     <h3>Total Products</h3>
                     <p>{{ total_products }}</p>
+                </a>
+            </div>
+        </div>
+        <div class="container-cogs">
+            <div class="card">
+                <a href=" {{ url_for('cogs_blueprint.cogs_records') }} " class="card-link">
+                    <h3>Total Cost of Goods</h3>
+                    <p>{{ total_cogs|currency }}</p>
+                </a>
+            </div>
+        </div>
+        <div class="container-revenue">
+            <div class="card">
+                <a href=" {{ url_for('sales_blueprint.sales') }} " class="card-link">
+                    <h3>Total Revenue</h3>
+                    <p>{{ revenue|currency }}</p>
+                </a>
+            </div>
+        </div>
+        <div class="container-roi">
+            <div class="card">
+                <a href=" {{ url_for('sales_blueprint.sales') }} " class="card-link">
+                    <h3>ROI</h3>
+                    <p>%{{ roi|round(2) }}</p>
                 </a>
             </div>
         </div>

@@ -5,6 +5,7 @@ from app.routes.login_required import login_required
 from app.forms.cogs import COGsForm, COGsUpdateForm
 import pandas as pd
 from app.scripts.log import event_logging
+from werkzeug.datastructures import MultiDict
 
 cogs_blueprint = Blueprint('cogs_blueprint', __name__)
 
@@ -12,9 +13,10 @@ cogs_blueprint = Blueprint('cogs_blueprint', __name__)
 @login_required
 def cogs_records():
     db = current_app.db
-   
     # Fetch all cogs records from the database
     cogs_records = list(db.cogs.find())
+    for cog in cogs_records:
+        cog['date_updated'] = cog['date_updated'].strftime("%Y-%m-%d")
     return render_template('cogs.html', cogs_records=cogs_records)
 
 @cogs_blueprint.route('/cogs_add', methods=['GET', 'POST'])
@@ -23,6 +25,8 @@ def cogs_add():
     
     db = current_app.db
     cogs_records = list(db.cogs.find())
+    for cog in cogs_records:
+        cog['date_updated'] = pd.to_datetime(cog['date_updated']).strftime("%Y-%m-%d")
     form = COGsForm()
 
     if session.get('user_id'):
@@ -32,27 +36,36 @@ def cogs_add():
         user_id = None
         account_id = session['account_id']
 
-    if form.validate_on_submit():
-        db_count = db['cogs'].count_documents({})
-
     if request.method == 'POST':
         date_inserted = datetime.now()
-        date_of_transaction = request.form.get('date_of_transaction')
-        description = request.form.get('description')
-        price = request.form.get('price')
-        type_of_goods = request.form.get('type_of_goods')
-        remarks = request.form.get('remarks ')
 
-        new_record = {
+        fields = [
+            'date_of_transaction',
+            'description',
+            'price',
+            'type_of_goods',
+            'store',
+            'remarks',
+            'payment_method'
+        ]
+
+        new_record = {}
+        for field in fields:
+            if field == 'price':
+                field_value = float(request.form.get(field))
+            else:
+                field_value = float(request.form.get(field))
+            new_record[field] = field_value
+
+        primary_fields = {
             'date_inserted': date_inserted,
             'account_id': account_id,
             'user_id': user_id,
-            'date_of_transaction': date_of_transaction,
-            'description': description,
-            'price': price,
-            'type_of_goods': type_of_goods,
-            'remarks': remarks
+            'date_updated': date_inserted            
         }
+
+        new_record.update(primary_fields)
+
         try:
             result = db.cogs.insert_one(new_record)
             result_id = result.inserted_id
@@ -99,25 +112,44 @@ def cogs_delete(record_id):
 @cogs_blueprint.route('/cogs_edit/<string:record_id>', methods=['GET', 'POST'])
 @login_required
 def cogs_edit(record_id):
+
     db = current_app.db
     record = db.cogs.find_one({"_id": ObjectId(record_id)})
     cogs_records = list(db.cogs.find())
+
+    fields = [
+            'date_of_transaction',
+            'description',
+            'price',
+            'type_of_goods',
+            'store',
+            'remarks',
+            'payment_method'
+        ]
 
     if not record:
         flash("Cost of goods record not found!", "danger")
         return redirect(url_for('cogs_blueprint.cogs_records'))
 
-    date_of_transaction = record.get('date_of_transaction')
-    date_of_transaction = pd.to_datetime(date_of_transaction, format="%Y-%m-%d")
-    print(type(date_of_transaction))
+    date_inserted = datetime.now()
+    primary_fields = {
+        'date_inserted': date_inserted,
+        'account_id': session.get('account_id'),
+        'user_id': session.get('user_id'),
+        'date_updated': date_inserted            
+    }
 
-    form = COGsUpdateForm(data={
-        'date_of_transaction': date_of_transaction,
-        'description': record.get('description'),
-        'price': record.get('price'),
-        'type_of_goods': record.get('type_of_goods'),
-        'remarks': record.get('remarks'),
-    })
+    data = {}
+    for field in fields:
+        data[field] = record.get(field)
+
+    data['date_of_transaction'] = pd.to_datetime(data['date_of_transaction'], format="%Y-%m-%d")
+
+    primary_fields.update(data)
+    print(primary_fields)
+
+    formdata = MultiDict(primary_fields)
+    form = COGsUpdateForm(data=formdata)
 
     if form.validate_on_submit():
         if session.get('user_id'):
@@ -132,7 +164,7 @@ def cogs_edit(record_id):
         date_inserted = datetime.now()
         date_of_transaction = form.date_of_transaction.data
         description = form.description.data
-        price = form.price.data
+        price = float(form.price.data)
         type_of_goods = form.type_of_goods.data
         remarks = form.remarks.data
 
