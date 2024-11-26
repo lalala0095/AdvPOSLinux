@@ -155,15 +155,8 @@ footer {
     .navbar-expand-lg .navbar-collapse {
         margin-top: 10px;
     }
-    .add-new-sale {
-        width: 100%; /* Full width on smaller screens */
-        max-width: none; /* Remove the max-width for full flexibility */
-    }
-    
-    .sales-records {
-        width: 100%; /* Full width for sales records on small screens */
-        min-width: 0; /* Remove the min-width for smaller screens */
-    }
+
+
 }
 
 input, select, textarea {
@@ -191,17 +184,6 @@ button {
 }
 
 /* Adjust Sales Records styling */
-.sales-records {
-    flex: 1; /* Allows it to take as much space as possible */
-    min-width: 600px; /* Ensures it doesn’t shrink too much */
-    width: 100%; /* Make it take the full width of the container */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    padding: 10px;
-    background-color: white;
-    text-align: center;
-    overflow-x: auto; /* Allow horizontal scroll for overflowing tables */
-}
 
 
 /* Styling for Add New Sale Form */
@@ -223,6 +205,9 @@ button {
     padding: 40px;
 }
 
+.col-md-1 {
+    max-width: 100px;
+}
 
 
 .row.g-3 {
@@ -237,16 +222,6 @@ button {
 
 
 /* Adjust Products Records styling */
-.records {
-    flex: 1; /* Allows it to take as much space as possible */
-    min-width: 600px; /* Ensures it doesn’t shrink too much */
-    width: 100%; /* Make it take the full width of the container */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    padding: 10px;
-    background-color: white;
-    overflow-x: auto; /* Allow horizontal scroll for overflowing tables */
-}
 
 
 /* Styling for Add New Sale Form */
@@ -269,11 +244,19 @@ button {
     margin: 0 auto; /* Centers the container */
 }
 
+.container-cards {
+    display: flex; 
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 20px; 
+    padding: 10px;
+    margin: 0 auto;
+    overflow-x: auto;
+}
 
 .card {
-    width: 100%;
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 10rem;
+    max-height: 10rem;
     background-color: #fff;
     border-radius: 10px;
     padding: 20px;
@@ -284,7 +267,6 @@ button {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 250px; /* Optional: Fixed height for uniform card sizes */
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 

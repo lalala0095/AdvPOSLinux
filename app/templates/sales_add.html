@@ -4,10 +4,10 @@
 <div class="container mt-4">
     <div class="row">
             <!-- Sales Records Container -->
-        <div class="col-md-6 sales-records">
+        <div class="col-md-6">
             <h5>Sales Records</h5>
-            <table class="table">
-                <thead>
+            <table class="table table-bordered">
+                <thead class="table-primary">
                     <tr>
                         <th>Date of Sale</th>
                         <th>Product Name</th>
@@ -32,7 +32,7 @@
             </table>
         </div>
         <!-- Add Sale Form Container -->
-        <div class="col-md-6 add-new-sale">
+        <div class="col-md-6 add-new-record">
             <h5 class="mt-5">Add New Sale</h5>
             <form method="POST" action="{{ url_for('sales_blueprint.sales_add') }}">
                 <div class="mb-3">

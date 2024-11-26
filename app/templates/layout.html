@@ -11,9 +11,6 @@
     {% else %}
         <title>Adv POS</title>
     {% endif %}
-</head>
-<body>
-    
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
@@ -117,16 +114,14 @@
             </div>
         </nav>
     </header>
+</head>
+<body>
+    
 
-    <main class="container">
-        <!-- <div class="row justify-content-center"> -->
-            <!-- <div class="col-md-2"></div> -->
-                <div class="col-md-10">
-                    {% block content %}
-                    {% endblock %}
-                </div>
-            <!-- <div class="col-md-2"></div> -->
-        <!-- </div> -->
+
+    <main>
+        {% block content %}
+        {% endblock %}
     </main>
   
     {% with messages = get_flashed_messages(with_categories=true) %}

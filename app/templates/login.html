@@ -1,50 +1,60 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <div class="mt-5">
-        <form action="{{ url_for('main.login') }}" method="POST">
-            {{ form.csrf_token() }}
-            <fieldset class="form-group">
-                <legend>Login User or Admin</legend>
+<div class="container mt-4">
+    <div class="row">
+            <!-- Sales Records Container -->
+        <div class="col-md-1">
+            <form action="{{ url_for('main.login') }}" method="POST">
+                {{ form.csrf_token() }}
+                <fieldset class="form-group">
+                    <legend>Login User or Admin</legend>
 
-                <!-- Username Field -->
-                <div class="form-group">
-                    {{ form.username.label(class="form-control-label") }}
-                    {% if form.username.errors %}
-                        {{ form.username(class="form-control is-invalid") }}
-                        {% for error in form.username.errors %}
-                            <div class="invalid-feedback">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        {{ form.username(class="form-control") }}
-                    {% endif %}
-                </div>
-
-                <!-- Password Field -->
-                <div class="form-group mt-3">
-                    {{ form.password.label(class="form-control-label") }}
-                    {% if form.password.errors %}
-                        {{ form.password(class="form-control is-invalid") }}
-                        {% for error in form.password.errors %}
-                            <div class="invalid-feedback">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        {{ form.password(class="form-control") }}
-                    {% endif %}
-                </div>
-
-                <div class="container-buttons">
-                    <!-- Submit Button -->
-                    <div class="form-group mt-3">
-                        {{ form.submit(class="btn btn-primary w-100") }}
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        {{ form.username.label(class="form-control-label") }}
+                        {% if form.username.errors %}
+                            {{ form.username(class="form-control is-invalid") }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.username(class="form-control") }}
+                        {% endif %}
                     </div>
-                    <a href="{{ url_for('main.admin_signup') }}", class="btn btn-secondary">Admin Signup</a>
-                </div>
-            </fieldset>
-        </form>
+
+                    <!-- Password Field -->
+                    <div class="form-group mt-3">
+                        {{ form.password.label(class="form-control-label") }}
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid") }}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="container-buttons">
+                        <!-- Submit Button -->
+                        <div class="form-group mt-3">
+                            {{ form.submit(class="btn btn-primary w-100") }}
+                        </div>
+                        <a href="{{ url_for('main.admin_signup') }}", class="btn btn-secondary">Admin Signup</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="col-md-4">
+                <h5>Welcome to Adv POS</h5>
+                <p>An all-in-one web app solution for managing sales, inventory and reports for small and medium enterprises here in the Philippines.</p>
+          
+        </div>
     </div>
+</div>
 {% endblock %}

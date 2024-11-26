@@ -6,8 +6,8 @@
             <!-- Products Records Container -->
         <div class="col-md-6 products-records">
             <h5>Products Records</h5>
-            <table class="table">
-                <thead>
+            <table class="table table-bordered">
+                <thead class="table-primary">
                     <tr>
                         <th>Product ID</th>
                         <th>Product Name</th>
@@ -28,7 +28,7 @@
             </table>
         </div>
         <!-- Add Product Form Container -->
-        <div class="col-md-6 add-new-product">
+        <div class="col-md-6 add-new-record">
             <h5 class="mt-5">Add New Product</h5>
             <form method="POST" action="{{ url_for('products_blueprint.products_add') }}">
                 <div class="mb-3">
