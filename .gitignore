@@ -4,6 +4,7 @@ testings.ipynb
 app/templates/*copy*
 app/routes/*copy*
 app/static/css/*copy*
+app/static/js/*copy*
 
 
 # Ignore .env file containing sensitive data

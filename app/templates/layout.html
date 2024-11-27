@@ -56,16 +56,16 @@
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle {% if 'sales_blueprint' in request.endpoint %}active{% endif %}" 
-                                    href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Sales
+                                    <a class="nav-link dropdown-toggle {% if 'orders_blueprint' in request.endpoint %}active{% endif %}" 
+                                    href="#" id="ordersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Orders
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="salesDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="ordersDropdown">
                                         <li>
-                                            <a class="dropdown-item" href="{{ url_for('sales_blueprint.sales') }}">View Sales</a>
+                                            <a class="dropdown-item" href="{{ url_for('orders_blueprint.orders') }}">View Orders</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ url_for('sales_blueprint.sales_add') }}">Add Sale</a>
+                                            <a class="dropdown-item" href="{{ url_for('orders_blueprint.orders_add') }}">Add Order</a>
                                         </li>
                                     </ul>
                                 </li>
@@ -147,40 +147,7 @@
     {% endif %}
     {% endwith %}
 
-  <script>
-      document.addEventListener('DOMContentLoaded', function () {
-          var passwordField = document.querySelector('[name="password"]');
-          var confirmPasswordField = document.querySelector('[name="confirm_password"]');
-          var capsLockIndicator = document.getElementById('capsLockIndicator');
-  
-          // Function to check Caps Lock state
-          function checkCapsLock(event) {
-              if (event.getModifierState && event.getModifierState("CapsLock")) {
-                  capsLockIndicator.style.display = "block";  // Show Caps Lock indicator
-              } else {
-                  capsLockIndicator.style.display = "none";  // Hide Caps Lock indicator
-              }
-          }
-  
-          // Check Caps Lock on keydown event for password fields
-          if (passwordField) {
-              passwordField.addEventListener('keydown', checkCapsLock);
-          }
-          if (confirmPasswordField) {
-              confirmPasswordField.addEventListener('keydown', checkCapsLock);
-          }
-  
-          // Optional: Hide the indicator when user clicks outside the password fields
-          passwordField.addEventListener('blur', function() {
-              capsLockIndicator.style.display = "none";
-          });
-  
-          confirmPasswordField.addEventListener('blur', function() {
-              capsLockIndicator.style.display = "none";
-          });
-      });
-  </script>
-  
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>

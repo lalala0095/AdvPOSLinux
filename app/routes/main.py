@@ -21,19 +21,19 @@ def authenticate_user(username, password, db):
 @login_required
 def index():
     db = current_app.db
-    total_sales = db.sales.aggregate([{'$group': {'_id': None, 'total': {'$sum': '$total'}}}]).next().get('total', 0)
-    total_sales_quantity = db.sales.aggregate([{'$group': {'_id': None, 'quantity': {'$sum': '$quantity'}}}]).next().get('quantity', 0)
+    total_orders = db.orders.aggregate([{'$group': {'_id': None, 'total': {'$sum': '$total'}}}]).next().get('total', 0)
+    total_orders_quantity = db.orders.aggregate([{'$group': {'_id': None, 'quantity': {'$sum': '$quantity'}}}]).next().get('quantity', 0)
     total_products = db.products.count_documents({})
-    total_cogs = db.sales.aggregate([{'$group': {'_id': None, 'total': {'$sum': '$price'}}}]).next().get('total', 0)
+    total_cogs = db.orders.aggregate([{'$group': {'_id': None, 'total': {'$sum': '$price'}}}]).next().get('total', 0)
 
-    revenue = total_sales - total_cogs
+    revenue = total_orders - total_cogs
     roi = (revenue/total_cogs) * 100
 
     return render_template("dashboard.html", title="Dashboard", 
-                           total_sales=total_sales, 
+                           total_orders=total_orders, 
                            total_products=total_products,
                            total_cogs=total_cogs,
-                           total_sales_quantity=total_sales_quantity,
+                           total_orders_quantity=total_orders_quantity,
                            revenue=revenue,
                            roi=roi)
 

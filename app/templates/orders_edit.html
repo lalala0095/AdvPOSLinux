@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Edit Sales Record</h2>
+    <h2>Edit Orders Record</h2>
 
-    <form method="POST" action="{{ url_for('sales_blueprint.sales_edit', record_id=record._id) }}">
+    <form method="POST" action="{{ url_for('orders_blueprint.orders_edit', record_id=record._id) }}">
         <div class="mb-3">
             <label for="product_label" class="form-label">Product</label>
             <select class="form-control" id="product_label" name="product_label" required onchange="updateProductDetails()">
@@ -22,8 +22,8 @@
         <input type="hidden" id="product_type" name="product_type" value="{{ record.product_type }}">
     
         <div class="mb-3">
-            <label for="sale_date" class="form-label">Date of Sale</label>
-            <input type="date" class="form-control" id="sale_date" name="sale_date" value="{{ record.date_of_sale }}" required>
+            <label for="order_date" class="form-label">Date of Order</label>
+            <input type="date" class="form-control" id="order_date" name="order_date" value="{{ record.date_of_order }}" required>
         </div>
         
         <div class="mb-3">
@@ -42,7 +42,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{{ url_for('sales_blueprint.sales') }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ url_for('orders_blueprint.orders') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 

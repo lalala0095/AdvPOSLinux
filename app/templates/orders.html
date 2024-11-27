@@ -2,13 +2,13 @@
 
 {% block content %}
     <div class="container mt-4">
-        <h5>Sales Records</h5>
+        <h5>Orders Records</h5>
 
-        <!-- Table for displaying sales records -->
+        <!-- Table for displaying orders records -->
         <table class="table table-bordered">
             <thead class="table-primary">
                 <tr>
-                    <th>Date of Sale</th>
+                    <th>Date of Order</th>
                     <th>Product Name</th>
                     <th>Product Type</th>
                     <th>Quantity</th>
@@ -18,9 +18,9 @@
                 </tr>
             </thead>
             <tbody>
-                {% for record in sales_records %}
+                {% for record in orders_records %}
                 <tr>
-                    <td>{{ record.date_of_sale }}</td>
+                    <td>{{ record.date_of_order }}</td>
                     <td>{{ record.product_name }}</td>
                     <td>{{ record.product_type }}</td>
                     <td>{{ record.quantity }}</td>
@@ -28,12 +28,12 @@
                     <td>${{ record.total }}</td>
                     <td>
                         <!-- Edit Icon -->
-                        <a href="{{ url_for('sales_blueprint.sales_edit', record_id=record._id) }}" class="btn btn-warning btn-sm">
+                        <a href="{{ url_for('orders_blueprint.orders_edit', record_id=record._id) }}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i>
                             Edit
                         </a>
                         <!-- Delete Icon -->
-                        <form action="{{ url_for('sales_blueprint.sales_delete', record_id=record._id) }}" method="POST" style="display:inline;">
+                        <form action="{{ url_for('orders_blueprint.orders_delete', record_id=record._id) }}" method="POST" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
                                 <i class="fas fa-trash"></i>
                                 Delete
@@ -43,10 +43,10 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="text-center">No sales records found.</td>
+                    <td colspan="7" class="text-center">No orders records found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('sales_blueprint.sales_add') }}" class="btn btn-primary">Add New Sale</a>
+        <a href="{{ url_for('orders_blueprint.orders_add') }}" class="btn btn-primary">Add New Order</a>
 {% endblock %}
