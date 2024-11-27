@@ -30,112 +30,87 @@
 //     });
 // });
 
-
 document.addEventListener('DOMContentLoaded', function () {
-    // Remove the first product after page load to avoid the issue with pre-rendered totals
-    const firstRow = document.querySelector("#products-table tbody tr");
-    if (firstRow) {
-        firstRow.remove();  // Remove the first pre-rendered product
-    }
+    const productsTable = document.querySelector("#products-table tbody");
+    const addProductBtn = document.getElementById("add-product-btn");
+    const productsInput = document.getElementById("products-input");
 
-    // Trigger total calculation for any dynamically added rows
-    document.getElementById("add-product-btn").addEventListener("click", addProductRow);
+    // Add a product row when the "Add" button is clicked
+    addProductBtn.addEventListener("click", function () {
+        const rowCount = productsTable.children.length;
 
-    // Attach remove listeners for dynamically added rows
-    attachRemoveListener();
-    
-    // Capture form data and serialize to hidden input
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>
+                <input type="text" name="products[${rowCount}][product_name]" class="form-control" placeholder="Product Name" required />
+            </td>
+            <td>
+                <input type="text" name="products[${rowCount}][product_type]" class="form-control" placeholder="Product Type" />
+            </td>
+            <td>
+                <input type="number" name="products[${rowCount}][quantity]" class="form-control" placeholder="Quantity" min="1" required />
+            </td>
+            <td>
+                <input type="number" name="products[${rowCount}][price]" class="form-control" placeholder="Price" step="0.01" min="0" required />
+            </td>
+            <td>
+                <input type="text" name="products[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger remove-product-btn">Remove</button>
+            </td>
+        `;
+        productsTable.appendChild(newRow);
+
+        attachRowListeners(newRow);
+    });
+
+    // Remove product rows dynamically
+    productsTable.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-product-btn")) {
+            e.target.closest("tr").remove();
+            updateRowNames();
+        }
+    });
+
+    // Serialize form data into the hidden input on form submission
     document.querySelector("form").addEventListener("submit", function (e) {
-        e.preventDefault();
+        const rows = productsTable.querySelectorAll("tr");
+        const products = Array.from(rows).map(row => ({
+            product_name: row.querySelector("input[name*='[product_name]']").value,
+            product_type: row.querySelector("input[name*='[product_type]']").value,
+            quantity: row.querySelector("input[name*='[quantity]']").value,
+            price: row.querySelector("input[name*='[price]']").value,
+            total: row.querySelector("input[name*='[total]']").value,
+        }));
 
-        const products = [];
-        const rows = document.querySelectorAll("#products-table tbody tr");
-
-        rows.forEach(row => {
-            const product = {
-                product_name: row.querySelector("input[name*='[product_name]']").value,
-                product_type: row.querySelector("input[name*='[product_type]']").value,
-                quantity: row.querySelector("input[name*='[quantity]']").value,
-                price: row.querySelector("input[name*='[price]']").value,
-                total: row.querySelector("input[name*='[total]']").value
-            };
-            products.push(product);
-        });
-
-        // Serialize to JSON and set to hidden input
-        const productsInput = document.getElementById("products-input");
-        productsInput.value = JSON.stringify(products);  // Ensure it's serialized
-
-        // Now submit the form
-        this.submit();  // Submit the form normally
+        // Set the serialized JSON into the hidden input
+        productsInput.value = JSON.stringify(products);
     });
-});
 
-function addProductRow() {
-    const tableBody = document.querySelector("#products-table tbody");
-    const rowCount = tableBody.children.length;
+    // Automatically calculate totals for each row
+    function attachRowListeners(row) {
+        const quantityInput = row.querySelector("input[name*='[quantity]']");
+        const priceInput = row.querySelector("input[name*='[price]']");
 
-    const newRow = document.createElement("tr");
-    newRow.innerHTML = `
-        <td>
-            <label>Product Name</label>
-            <input type="text" name="products[${rowCount}][product_name]" class="form-control" />
-        </td>
-        <td>
-            <label>Product Type</label>
-            <input type="text" name="products[${rowCount}][product_type]" class="form-control" />
-        </td>
-        <td>
-            <label>Quantity</label>
-            <input type="number" name="products[${rowCount}][quantity]" class="form-control" />
-        </td>
-        <td>
-            <label>Price</label>
-            <input type="number" name="products[${rowCount}][price]" class="form-control" />
-        </td>
-        <td>
-            <label>Total</label>
-            <input type="number" name="products[${rowCount}][total]" class="form-control" readonly />
-        </td>
-        <td>
-            <button type="button" class="btn btn-danger remove-product-btn">Remove</button>
-        </td>
-    `;
-    
-    tableBody.appendChild(newRow);
-    attachRowListeners(newRow);
-    attachRemoveListener();
-}
-
-function attachRowListeners(row) {
-    const quantityInput = row.querySelector("[name*='[quantity]']");
-    const priceInput = row.querySelector("[name*='[price]']");
-    if (quantityInput && priceInput) {
-        quantityInput.addEventListener("change", function () {
-            updateTotal(quantityInput);
-        });
-        priceInput.addEventListener("change", function () {
-            updateTotal(priceInput);
+        [quantityInput, priceInput].forEach(input => {
+            input.addEventListener("input", function () {
+                const quantity = parseFloat(quantityInput.value || 0);
+                const price = parseFloat(priceInput.value || 0);
+                const totalField = row.querySelector("input[name*='[total]']");
+                totalField.value = (quantity * price).toFixed(2);
+            });
         });
     }
-}
 
-function updateTotal(input) {
-    const row = input.closest("tr");
-    const quantity = parseFloat(row.querySelector("[name*='[quantity]']").value) || 0;
-    const price = parseFloat(row.querySelector("[name*='[price]']").value) || 0;
-    const totalField = row.querySelector("[name*='[total]']");
-
-    const total = quantity * price;
-    totalField.value = total > 0 ? total.toFixed(2) : "";
-}
-
-function attachRemoveListener() {
-    const removeBtns = document.querySelectorAll(".remove-product-btn");
-
-    removeBtns.forEach((btn) => {
-        btn.addEventListener("click", function () {
-            btn.closest("tr").remove();
+    // Update row input names after a row is removed
+    function updateRowNames() {
+        const rows = productsTable.querySelectorAll("tr");
+        rows.forEach((row, index) => {
+            row.querySelectorAll("input").forEach(input => {
+                const name = input.name.replace(/\[\d+\]/, `[${index}]`);
+                input.name = name;
+            });
         });
-    });
-}
+    }
+});

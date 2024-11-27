@@ -102,7 +102,7 @@ def admin_signup():
             'is_admin': True
         }
 
-        result = db.accounts.insert_one()
+        result = db.accounts.insert_one(new_record)
         result_id = result.inserted_id
         new_record['_id'] = result_id
             

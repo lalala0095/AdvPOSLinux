@@ -7,6 +7,7 @@ from app.routes.login_required import login_required
 from app.forms.orders import OrderForm
 import pandas as pd
 import json
+from app.scripts.log import event_logging
 
 orders_blueprint = Blueprint('orders_blueprint', __name__)
 
@@ -33,10 +34,7 @@ def orders_add():
     form = OrderForm()
 
     if request.method == 'POST':
-        # Print the request form data to verify products are passed
-        print("Form Data:", request.form)
-        print("Products Data:", request.form.getlist('products'))
-        
+        print("form validated")        
         products_data = request.form.get('products')
 
         products_count = products_data.count('product_name')
@@ -52,16 +50,14 @@ def orders_add():
             products_data_final.append(product)
         
         # Ensure you have products data before proceeding
-        print(products_data_final)
         if not products_data_final:
             flash("Please add at least one product.", "danger")
         else:
             total_price = []
             for p in products_data_final:
-                print(type(p))
-                # total_price.append(float(p['total']))
-            # total_price = sum(total_price)
-            total_price = None
+                total_price.append(float(p['total']))
+            total_price = sum(total_price)
+            # total_price = None
             new_order = {
                 'date_inserted': datetime.now(),
                 'date_of_order': request.form.get('date_of_order'),
@@ -69,10 +65,33 @@ def orders_add():
                 'customer': request.form.get('customer_name'),
                 'total_price': total_price,
             }
-            db.orders.insert_one(new_order)  # Save the new order directly to MongoDB
-            flash("Order successfully added.", "success")
-            return redirect(url_for('orders_blueprint.orders_add'))
-
+            print(f"new order: {new_order}")
+            try:
+                result = db.orders.insert_one(new_order)  # Save the new order directly to MongoDB
+                flash("Order successfully added.", "success")
+                event_logging(
+                    event_var="adding orders",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=result.inserted_id,
+                    old_doc=None,
+                    new_doc=None,
+                    error=None
+                )
+                # return redirect(url_for('orders_blueprint.orders_add'))
+            except Exception as e:
+                flash("Order not saved", "danger")
+                flash(form.errors)
+                print(form.errors)
+                event_logging(
+                    event_var="adding order error",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=None,
+                    old_doc=None,
+                    new_doc=None,
+                    error=e
+                )
     return render_template('orders_add.html', products_db=products_db, orders=orders, form=form)
 
 #------------
