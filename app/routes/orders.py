@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 from app.routes.login_required import login_required
 from app.forms.orders import OrderForm
 import pandas as pd
+import json
 
 orders_blueprint = Blueprint('orders_blueprint', __name__)
 
@@ -21,68 +22,61 @@ def orders():
     orders_records = list(db.orders.find())
     return render_template('orders.html', orders_records=orders_records, products=products)
 
+
+#------------
 @orders_blueprint.route('/orders_add', methods=['GET', 'POST'])
 @login_required
 def orders_add():
     db = current_app.db
-    products = list(db.products.find())
+    products_db = list(db.products.find())  # Get products from the database
     orders = list(db.orders.find())  # Fetch all orders records
     form = OrderForm()
 
-    if not form.validate_on_submit():
-        print("Form validation failed!")
-        print(form.errors)  # This will show any validation errors
-    else:
-        if form.validate_on_submit():
-            print("Form validated!")
+    if request.method == 'POST':
+        # Print the request form data to verify products are passed
+        print("Form Data:", request.form)
+        print("Products Data:", request.form.getlist('products'))
+        
+        products_data = request.form.get('products')
 
-            # Retrieve product details from the form
-            products_data = []
-            for product in form.products.data:
-                product_data = {
-                    'product_name': product.get('product_name'),
-                    'product_type': product.get('product_type'),
-                    'quantity': int(product.get('quantity')) ,
-                    'price': float(product.get('price')),
-                    'total': float(product.get('total')),
-                }
-                products_data.append(product_data)
-
-            date_of_order = form.date_of_order.data
-            date_of_order = pd.to_datetime(date_of_order)
-            # Create the order record
-            new_record = {
-                'date_inserted': datetime.now(),
-                'date_of_order': date_of_order,
-                'products': products_data,
-                'customer': form.customer_name.data,
-                'total_price': sum(p['total'] for p in products_data),  # Calculate total price
+        products_count = products_data.count('product_name')
+        products_data_final = []
+        for i in range(0, products_count):  # Loop through the product fields
+            product = {
+                'product_name': request.form.get(f'products[{i}][product_name]'),
+                'product_type': request.form.get(f'products[{i}][product_type]'),
+                'quantity': request.form.get(f'products[{i}][quantity]'),
+                'price': request.form.get(f'products[{i}][price]'),
+                'total': request.form.get(f'products[{i}][total]'),
             }
+            products_data_final.append(product)
+        
+        # Ensure you have products data before proceeding
+        print(products_data_final)
+        if not products_data_final:
+            flash("Please add at least one product.", "danger")
+        else:
+            total_price = []
+            for p in products_data_final:
+                print(type(p))
+                # total_price.append(float(p['total']))
+            # total_price = sum(total_price)
+            total_price = None
+            new_order = {
+                'date_inserted': datetime.now(),
+                'date_of_order': request.form.get('date_of_order'),
+                'products': products_data_final,
+                'customer': request.form.get('customer_name'),
+                'total_price': total_price,
+            }
+            db.orders.insert_one(new_order)  # Save the new order directly to MongoDB
+            flash("Order successfully added.", "success")
+            return redirect(url_for('orders_blueprint.orders_add'))
 
-            try:
-                db.orders.insert_one(new_record)
-                flash("Order added successfully!", "success")
-                return redirect(url_for('orders_blueprint.orders_add'))
-            except Exception as e:
-                flash(f"Database error: {str(e)}", "danger")
+    return render_template('orders_add.html', products_db=products_db, orders=orders, form=form)
 
+#------------
 
-            
-        # if request.method == 'POST':
-        #     for field, errors in form.errors.items():
-        #         for error in errors:
-        #             flash(f"Error in {getattr(form, field).label.text}: {error}", "danger")
-        # else:
-        #     print(form.errors)
-        #     for field, errors in form.errors.items():
-        #         for error in errors:
-        #             print(f"Error in {getattr(form, field).label.text}: {error}")
-        #     flash("All fields are required!", "danger")
-
-
-        # flash("All fields are required!", "danger")
-
-    return render_template('orders_add.html', products=products, orders=orders, form=form)
 
 # Route to delete a orders record
 @orders_blueprint.route('/orders_delete/<string:record_id>', methods=['POST'])

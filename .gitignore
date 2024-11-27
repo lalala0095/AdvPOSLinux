@@ -5,7 +5,7 @@ app/templates/*copy*
 app/routes/*copy*
 app/static/css/*copy*
 app/static/js/*copy*
-
+app/forms/*copy*
 
 # Ignore .env file containing sensitive data
 .env

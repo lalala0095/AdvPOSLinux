@@ -34,15 +34,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for product in form.products %}
+                            <!-- {% for product in form.products %}
                                 <tr>
                                     <td>{{ product.product_name(class="form-control") }}</td>
                                     <td>{{ product.product_type(class="form-control") }}</td>
-                                    <td>{{ product.quantity(class="form-control", onchange="updateTotal(this)") }}</td>
-                                    <td>{{ product.price(class="form-control", onchange="updateTotal(this)") }}</td>
+                                    <td>{{ product.quantity(class="form-control") }}</td>
+                                    <td>{{ product.price(class="form-control") }}</td>
                                     <td>{{ product.total(class="form-control", readonly="true") }}</td>
                                     <td><button type="button" class="btn btn-danger remove-product-btn">Remove</button></td>
-                                </tr>
+                                </tr> -->
                             {% endfor %}
                         </tbody>
                     </table>
@@ -53,6 +53,8 @@
                     <label for="customer_name" class="form-label">Customer</label>  
                     {{ form.customer_name(class="form-control mb-2") }}
                 </div>
+                
+                <input type="hidden" name="products" id="products-input" />
 
                 <!-- Submit Order Button -->
                 <button type="submit" class="btn btn-primary mt-3">Save Order</button>
