@@ -20,15 +20,54 @@ def authenticate_user(username, password, db):
 @main.route("/")
 @login_required
 def index():
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     db = current_app.db
-    total_orders = db.orders.aggregate([{'$group': {'_id': None, 'total': {'$sum': '$total'}}}]).next().get('total', 0)
-    total_orders_quantity = db.orders.aggregate([{'$group': {'_id': None, 'quantity': {'$sum': '$quantity'}}}]).next().get('quantity', 0)
-    total_products = db.products.count_documents({})
-    total_cogs = db.orders.aggregate([{'$group': {'_id': None, 'total': {'$sum': '$price'}}}]).next().get('total', 0)
+
+    total_orders = 0
+    cursor = db.orders.aggregate([
+        {"$match": {'user_id': user_id, 'account_id': account_id}},
+        {'$group': {'_id': None, 'total': {'$sum': '$net_price'}}}
+    ])
+    try:
+        total_orders = cursor.next().get('total', 0)
+    except StopIteration:
+        total_orders = 0
+
+    total_orders_quantity = 0
+    cursor = db.orders.aggregate([
+        {"$match": {'user_id': user_id, 'account_id': account_id}},
+        {'$group': {'_id': None, 'total': {'$sum': 1}}}
+    ])
+    try:
+        total_orders_quantity = cursor.next().get('total', 0)
+    except StopIteration:
+        total_orders_quantity = 0
+
+    total_products = db.products.count_documents({
+        'user_id': user_id,
+        'account_id': account_id
+    })
+
+    total_cogs = 0
+    cursor = db.orders.aggregate([
+        {"$match": {'user_id': user_id, 'account_id': account_id}},
+        {'$group': {'_id': None, 'total': {'$sum': '$price'}}}
+    ])
+    try:
+        total_cogs = cursor.next().get('total', 0)
+    except StopIteration:
+        total_cogs = 0
 
     revenue = total_orders - total_cogs
-    roi = (revenue/total_cogs) * 100
 
+    try:
+        roi = (revenue/total_cogs) * 100
+    except Exception as e:
+        roi = 0
+        flash(f"No available COGs data yet, you may add them to see your ROI.", "danger")
+    
     return render_template("dashboard.html", title="Dashboard", 
                            total_orders=total_orders, 
                            total_products=total_products,

@@ -11,8 +11,14 @@ products_blueprint = Blueprint('products_blueprint', __name__)
 def products():
     db = current_app.db
    
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     # Fetch all products records from the database
-    products_records = list(db.products.find())
+    products_records = list(db.products.find({
+        'user_id': user_id,
+        'account_id': account_id
+    }))
     return render_template('products.html', products_records=products_records)
 
 
@@ -20,6 +26,10 @@ def products():
 @login_required
 def products_add():
     db = current_app.db
+
+    user_id = session.get('user_id')
+    account_id = session.get('account_id')
+    
     if request.method == 'POST':
         # Add a new products record
         date_inserted = datetime.now()
@@ -32,6 +42,8 @@ def products_add():
         if product_name and price:
             new_record = {
                 "date_inserted": date_inserted,
+                "account_id": account_id,
+                "user_id": user_id,
                 "product_id": int(product_id),
                 "product_name": product_name,
                 "product_type": product_type,
@@ -54,7 +66,10 @@ def products_add():
         return redirect(url_for('products_blueprint.products_add'))
 
     # Fetch all products records from the database
-    products_records = list(db.products.find())
+    products_records = list(db.products.find({
+        'user_id': user_id,
+        'account_id': account_id
+    }))
     return render_template('products_add.html', products_records=products_records)
 
 
@@ -110,6 +125,8 @@ def products_edit(record_id):
         if product_name and product_id:
             updated_record = {
                 "date_inserted": date_inserted,
+                "account_id": session.get('account_id'),
+                "user_id": session.get('user_id'),
                 "product_id": int(product_id),
                 "product_name": product_name,
                 "product_type": product_type,

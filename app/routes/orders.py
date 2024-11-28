@@ -15,12 +15,23 @@ orders_blueprint = Blueprint('orders_blueprint', __name__)
 @orders_blueprint.route('/orders_records', methods=['GET', 'POST'])
 @login_required
 def orders():
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     db = current_app.db
 
-    products = list(db.products.find())
+    products = list(db.products.find({
+        "account_id": account_id,
+        "user_id": user_id
+    }
+    ))
 
     # Fetch all orders records from the database
-    raw_orders = list(db.orders.find())
+    raw_orders = list(db.orders.find({
+        "account_id": account_id,
+        "user_id": user_id
+    }
+    ))
 
     # Transform the raw orders into the desired structure
     orders_records = []
@@ -52,9 +63,20 @@ def orders():
 @orders_blueprint.route('/orders_add', methods=['GET', 'POST'])
 @login_required
 def orders_add():
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     db = current_app.db
-    products_db = list(db.products.find())  # Get products from the database
-    orders = list(db.orders.find())  # Fetch all orders records
+    products_db = list(db.products.find(
+        {
+            "account_id": account_id,
+            "user_id": user_id
+        }
+    ))  # Get products from the database
+    orders = list(db.orders.find({
+        "account_id": account_id,
+        "user_id": user_id
+    }))  # Fetch all orders records
     form = OrderForm()
 
     if request.method == 'POST':
@@ -127,6 +149,8 @@ def orders_add():
 
             new_order = {
                 'date_inserted': datetime.now(),
+                'user_id': session.get('user_id'),
+                'account_id': session.get('account_id'),
                 'date_of_order': request.form.get('date_of_order'),
                 'products': products_data_final,
                 'total_products_price': total_price,
@@ -199,9 +223,17 @@ def orders_delete(record_id):
 @orders_blueprint.route('/orders_edit/<string:record_id>', methods=['GET', 'POST'])
 @login_required
 def orders_edit(record_id):
+    account_id = session['account_id']
+    user_id = session['user_id']
+
     db = current_app.db
     record = db.orders.find_one({"_id": ObjectId(record_id)})
-    products_db = list(db.products.find())  # Fetch available products for dropdowns
+    products_db = list(db.products.find(
+        {
+            "account_id": account_id,
+            "user_id": user_id
+        }
+    ))  # Fetch available products for dropdowns
 
     fields = [
             'date_of_order',
@@ -338,6 +370,8 @@ def orders_edit(record_id):
 
             new_order = {
                 'date_inserted': record.get('date_inserted'),
+                'user_id': session.get('user_id'),
+                'account_id': session.get('account_id'),
                 'date_of_order': request.form.get('date_of_order'),
                 'products': products_data_final,
                 'total_products_price': total_price,
@@ -364,7 +398,7 @@ def orders_edit(record_id):
             }
             print(f"new order: {new_order}")
             try:
-                result = db.staging_orders.update_one({"_id": ObjectId(record_id)}, {"$set": new_order})
+                result = db.orders.update_one({"_id": ObjectId(record_id)}, {"$set": new_order})
                 flash("Order successfully modified.", "success")
                 event_logging(
                     event_var="update orders",

@@ -12,9 +12,15 @@ cogs_blueprint = Blueprint('cogs_blueprint', __name__)
 @cogs_blueprint.route('/cogs_records', methods=['GET', 'POST'])
 @login_required
 def cogs_records():
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     db = current_app.db
     # Fetch all cogs records from the database
-    cogs_records = list(db.cogs.find())
+    cogs_records = list(db.cogs.find({
+        'user_id': user_id,
+        'account_id': account_id
+    }))
     for cog in cogs_records:
         cog['date_updated'] = cog['date_updated'].strftime("%Y-%m-%d")
     return render_template('cogs.html', cogs_records=cogs_records)
@@ -22,9 +28,14 @@ def cogs_records():
 @cogs_blueprint.route('/cogs_add', methods=['GET', 'POST'])
 @login_required
 def cogs_add():
-    
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     db = current_app.db
-    cogs_records = list(db.cogs.find())
+    cogs_records = list(db.cogs.find({
+        'user_id': user_id,
+        'account_id': account_id
+    }))
     for cog in cogs_records:
         cog['date_updated'] = pd.to_datetime(cog['date_updated']).strftime("%Y-%m-%d")
     form = COGsForm()
@@ -97,6 +108,9 @@ def cogs_add():
 @cogs_blueprint.route('/cogs_delete/<string:record_id>', methods=['POST'])
 @login_required
 def cogs_delete(record_id):
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
     db = current_app.db
     record = db.cogs.find_one({"_id": ObjectId(record_id)})
     try:
@@ -112,10 +126,15 @@ def cogs_delete(record_id):
 @cogs_blueprint.route('/cogs_edit/<string:record_id>', methods=['GET', 'POST'])
 @login_required
 def cogs_edit(record_id):
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
 
     db = current_app.db
     record = db.cogs.find_one({"_id": ObjectId(record_id)})
-    cogs_records = list(db.cogs.find())
+    cogs_records = list(db.cogs.find({
+        'user_id': user_id,
+        'account_id': account_id
+    }))
 
     fields = [
             'date_of_transaction',
