@@ -1,84 +1,191 @@
-{% extends "layout.html" %}
+{% extends "layout_edits.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Edit Orders Record</h2>
+<div class="container-orders">
+    <form class="form-group" method="POST" action="{{ url_for('orders_blueprint.orders_edit', record_id=record['_id']) }}">
+        <h5 class="mt-5">Add New Order</h5>
+        {{ form.hidden_tag() }}
 
-    <form method="POST" action="{{ url_for('orders_blueprint.orders_edit', record_id=record._id) }}">
-        <div class="mb-3">
-            <label for="product_label" class="form-label">Product</label>
-            <select class="form-control" id="product_label" name="product_label" required onchange="updateProductDetails()">
-                {% for product in products %}
-                    <option value="{{ product.product_name }}|{{ product.product_type }}" 
-                        {% if product.product_id == record.product_id %}selected{% endif %}
-                        data-price="{{ product.price }}" data-product-id="{{ product.product_id }}">
-                        {{ product.product_name }} - {{ product.product_type }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <input type="hidden" id="product_id" name="product_id" value="{{ record.product_id }}">
-        <input type="hidden" id="product_name" name="product_name" value="{{ record.product_name }}">
-        <input type="hidden" id="product_type" name="product_type" value="{{ record.product_type }}">
-    
-        <div class="mb-3">
-            <label for="order_date" class="form-label">Date of Order</label>
-            <input type="date" class="form-control" id="order_date" name="order_date" value="{{ record.date_of_order }}" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="quantity" class="form-label">Quantity</label>
-            <input type="number" class="form-control" id="quantity" name="quantity" value="{{ record.quantity }}" required oninput="calculateTotal()">
+        <!-- Customer Section -->
+        <div class="col-md-6 add-new-record">
+            {{ form.customer.label(class="form.label",  style="font-weight: bold;") }}
+            <div class="mb-3" id="customer-form">
+                {{ form.customer.customer_name.label(class="form.label",  style="font-weight: normal;") }}
+                {{ form.customer.customer_name(class="form-control") }}
+                {{ form.customer.address.label(class="form.label",  style="font-weight: normal;") }}
+                {{ form.customer.address(class="form-control") }}
+                {{ form.customer.shipping_address.label(class="form.label",  style="font-weight: normal;") }}
+                {{ form.customer.shipping_address(class="form-control") }}
+                {{ form.customer.company_name.label(class="form.label",  style="font-weight: normal;") }}
+                {{ form.customer.company_name(class="form-control") }}
+                {{ form.customer.contact_number.label(class="form.label",  style="font-weight: normal;") }}
+                {{ form.customer.contact_number(class="form-control") }}
+                {{ form.customer.email.label(class="form.label",  style="font-weight: normal;") }}
+                {{ form.customer.email(class="form-control") }}
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ record.price }}" required>
+        <div class="col-md-6 add-new-record">
+            <div class="mb-3">
+                {{ form.status.label(class="form.label",  style="font-weight: bold;") }}
+                {{ form.status(class="form-control mb-2", id="status") }}
+            </div>
+            <div class="mb-3">
+                {{ form.custom_status.label(class="form.label",  style="font-weight: bold;") }}
+                {{ form.custom_status(class="form-control mb-2") }}
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label for="total" class="form-label">Total</label>
-            <input type="number" step="0.01" class="form-control" id="total" name="total" value="{{ record.total }}" readonly>
+        <div class="col-md-6 add-new-record">
+            <div class="mb-3">
+                {{ form.date_of_order.label(class="form.label",  style="font-weight: bold;") }}
+                {{ form.date_of_order(class="form-control mb-2") }}
+            </div>
+            <div id="date-sold-container" class="mb-3">
+                {{ form.date_sold.label(class="form.label",  style="font-weight: bold;") }}
+                {{ form.date_sold(class="form-control mb-2") }}    
+            </div>
+            <div id="date-cancelled-container" class="mb-3">
+                {{ form.date_cancelled.label(class="form.label",  style="font-weight: bold;") }}
+                {{ form.date_cancelled(class="form-control mb-2") }}
+            </div>
+            <div id="date-payment-container" class="mb-3">
+                {{ form.date_of_payment.label(class="form.label",  style="font-weight: bold;") }}
+                {{ form.date_of_payment(class="form-control mb-2") }}
+            </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{{ url_for('orders_blueprint.orders') }}" class="btn btn-secondary">Cancel</a>
+        <!-- Products Section -->
+        <div class="mb-4">
+            <div id="products-placeholder" class="d-flex justify-content-between align-items-center">
+                {{ form.products.label(class="form.label",  style="font-weight: bold;") }}
+                <button type="button" class="btn btn-success btn-sm" id="add-product-btn">+</button>
+            </div>
+            <!-- Product Table -->
+            <table class="table mt-3" id="products-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Product Type</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in record['products'] %}
+                        <tr>
+                            <td>
+                                <input type="text" name="products[{{ loop.index0 }}][product_name]" value="{{ product['product_name'] }}" class="form-control" />
+                            </td>
+                            <td>
+                                <input type="text" name="products[{{ loop.index0 }}][product_type]" value="{{ product['product_type'] }}" class="form-control" />
+                            </td>
+                            <td>
+                                <input type="number" name="products[{{ loop.index0 }}][quantity]" value="{{ product['quantity'] }}" class="form-control" />
+                            </td>
+                            <td>
+                                <input type="number" name="products[{{ loop.index0 }}][price]" value="{{ product['price'] }}" step="0.01" class="form-control" />
+                            </td>
+                            <td>
+                                <input type="number" name="products[{{ loop.index0 }}][total]" value="{{ product['total'] }}" step="0.01" class="form-control" readonly />
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger remove-product-btn" name="remove-product-edit-btn">Remove</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" name="products" id="products-input" />
+
+        <!-- Deductions Section -->
+        <div class="mb-4">
+            <div id="deductions-placeholder" class="d-flex justify-content-between align-items-center">
+                {{ form.deductions.label(class="form.label",  style="font-weight: bold;") }}
+                <button type="button" class="btn btn-success btn-sm" id="add-deductions-btn">+</button>
+            </div>
+            <table class="table mt-3" id="deductions-table">
+                <thead>
+                    <tr>
+                        <th>Deduction Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for deduction in record.get('deductions') %}
+                    <tr>
+                        <td>
+                            <input type="text" name="deductions[{{ loop.index0 }}][deduction_name]" value="{{ deduction['deduction_name'] }}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="deductions[{{ loop.index0 }}][quantity]" value="{{ deduction['quantity'] }}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="deductions[{{ loop.index0 }}][price]" value="{{ deduction['price'] }}" step="0.01" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="deductions[{{ loop.index0 }}][total]" value="{{ deduction['total'] }}" step="0.01" class="form-control" readonly />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger remove-deduction-btn" name="remove-deduction-edit-btn">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" name="deductions" id="deductions-input" />
+
+        <!-- Charges Section -->
+        <div class="mb-4">
+            <div id="charges-placeholder" class="d-flex justify-content-between align-items-center">
+                {{ form.charges.label(class="form.label",  style="font-weight: bold;") }}
+                <button type="button" class="btn btn-success btn-sm" id="add-charges-btn">+</button>
+            </div>
+            <table class="table mt-3" id="charges-table">
+                <thead>
+                    <tr>
+                        <th>Charge Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for charge in record.get('charges') %}
+                    <tr>
+                        <td>
+                            <input type="text" name="charges[{{ loop.index0 }}][charge_name]" value="{{ charge['charge_name'] }}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="charges[{{ loop.index0 }}][quantity]" value="{{ charge['quantity'] }}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="charges[{{ loop.index0 }}][price]" value="{{ charge['price'] }}" step="0.01" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="charges[{{ loop.index0 }}][total]" value="{{ charge['total'] }}" step="0.01" class="form-control" readonly />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger remove-charge-btn" name="remove-charge-edit-btn">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" name="charges" id="charges-input" />
+
+        <!-- Submit Order Button -->
+        <button type="submit" class="btn btn-primary mt-3">Save Order</button>
+        <a href="{{ url_for('orders_blueprint.orders') }}" class="btn btn-secondary mt-3">Cancel</a>
     </form>
 </div>
-
-<script>
-    // Function to update product details when a product is selected
-    function updateProductDetails() {
-        var productSelect = document.getElementById('product_label');
-        var selectedProduct = productSelect.options[productSelect.selectedIndex];
-        var productName = selectedProduct.value.split('|')[0];
-        var productType = selectedProduct.value.split('|')[1];
-        var productId = selectedProduct.getAttribute('data-product-id');
-        var productPrice = selectedProduct.getAttribute('data-price');
-
-        // Set the values in the form fields
-        document.getElementById('product_id').value = productId;
-        document.getElementById('product_name').value = productName;
-        document.getElementById('product_type').value = productType;
-        document.getElementById('price').value = productPrice;
-
-        // Reset quantity and total fields
-        // document.getElementById('quantity').value = '';
-        // document.getElementById('total').value = '';
-        calculateTotal()
-    }
-
-    // Function to calculate total price based on quantity and product price
-    function calculateTotal() {
-        var quantity = parseFloat(document.getElementById('quantity').value);
-        var price = parseFloat(document.getElementById('price').value);
-
-        if (!isNaN(quantity) && !isNaN(price)) {
-            var total = quantity * price;
-            document.getElementById('total').value = total.toFixed(2);  // Format the total to 2 decimal places
-        } else {
-            document.getElementById('total').value = '';  // Clear total if inputs are invalid
-        }
-    }
-</script>
 {% endblock %}

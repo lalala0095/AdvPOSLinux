@@ -63,3 +63,21 @@ class OrderForm(FlaskForm):
     date_sold = DateField("Date Sold", validators=[Optional()])
     date_cancelled = DateField("Date Cancelled", validators=[Optional()])
     date_of_payment = DateField("Date Of Payment", validators=[Optional()])
+
+class OrderEditForm(FlaskForm):
+    date_of_order = DateField("Date Ordered")
+    products = FieldList(FormField(ProductForm), min_entries=1)
+    customer = FormField(CustomerForm, label="Customer Information (Optional)")    
+    deductions = FieldList(FormField(Deductions), min_entries=0, label="Deductions (Optional)")
+    charges = FieldList(FormField(OtherChargesToCustomer), min_entries=0, label="Charges to Customer (Optional)")
+    total_price = DecimalField("Total Price", validators=[Optional()])
+    submit = SubmitField("Submit Order")
+    status = SelectField("Order Status", choices=[("", "Select Status"),
+                                            ("Active", "Active"),     
+                                            ("Awaiting Payment", "Awaiting Payment"),
+                                            ("Sold", "Sold"),
+                                            ("Cancelled", "Cancelled")], validators=[Optional()])
+    custom_status = StringField("Custom Status", validators=[Optional()])
+    date_sold = DateField("Date Sold", validators=[Optional()])
+    date_cancelled = DateField("Date Cancelled", validators=[Optional()])
+    date_of_payment = DateField("Date Of Payment", validators=[Optional()])

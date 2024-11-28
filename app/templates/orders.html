@@ -1,52 +1,169 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h5>Orders Records</h5>
+<div class="container mt-4">
+    <h5>Orders Records</h5>
 
-        <!-- Table for displaying orders records -->
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <th>Date of Order</th>
-                    <th>Product Name</th>
-                    <th>Product Type</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                    <th>Options</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in orders_records %}
-                <tr>
-                    <td>{{ record.date_of_order }}</td>
-                    <td>{{ record.product_name }}</td>
-                    <td>{{ record.product_type }}</td>
-                    <td>{{ record.quantity }}</td>
-                    <td>${{ record.price }}</td>
-                    <td>${{ record.total }}</td>
-                    <td>
-                        <!-- Edit Icon -->
-                        <a href="{{ url_for('orders_blueprint.orders_edit', record_id=record._id) }}" class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i>
-                            Edit
-                        </a>
-                        <!-- Delete Icon -->
-                        <form action="{{ url_for('orders_blueprint.orders_delete', record_id=record._id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-                                <i class="fas fa-trash"></i>
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">No orders records found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{{ url_for('orders_blueprint.orders_add') }}" class="btn btn-primary">Add New Order</a>
+    <!-- Table for displaying orders records -->
+    <table class="table table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>Date of Order</th>
+                <th>Customer</th>
+                <th>Details</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in orders_records %}
+            <tr>
+                <td>{{ record.date_of_order }}</td>
+                <td>{{ record.get('customer').customer_name or 'N/A' }}</td>
+                <td>
+                    <!-- Collapsible section for details -->
+                    <button class="btn btn-link btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ loop.index }}" aria-expanded="false" aria-controls="details-{{ loop.index }}">
+                        View Details
+                    </button>
+                    <div class="collapse mt-2" id="details-{{ loop.index }}">
+                        <!-- Display Products -->
+                        <strong>Customer:</strong>
+                        <ul>
+                            {% if record.get('customer') %}
+                                <li>
+                                    {% if record.customer.customer_name %}
+                                        Customer Name: {{ record.customer.customer_name }}
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if record.customer.address %}
+                                        Address: {{ record.customer.address }}
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if record.customer.shipping_address %}
+                                    Shipping Address: {{ record.customer.shipping_address }}
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if record.customer.company_name %}
+                                    Company: {{ record.customer.company_name }}
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if record.customer.contact_number %}
+                                    Contact Number: {{ record.customer.contact_number }}
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if record.customer.email %}
+                                    Email: {{ record.customer.email }}
+                                    {% endif %}
+                                </li>
+                            {% endif %}                        
+                        </ul>
+
+                        <!-- Display Others -->
+                        <strong>Order Status:</strong>
+                        <ul>
+                            <li>
+                                Status: {{ record.get('status') }}
+                            </li>
+                            <li>
+                                {% if record.get('custom_status') %}
+                                    Custom Status: {{ record.get('custom_status') }}
+                                {% endif %}
+                            </li>
+                        </ul>
+
+                        <!-- Display Dates -->
+                        <strong>Dates:</strong>
+                        <ul>
+                            <li>
+                                Date of Order: {{ record.get('date_of_order') }}
+                            </li>
+                            </li>
+                                {% if record.get('date_sold') %}
+                                    Date Sold: {{ record.get('date_sold') }}
+                                {% endif %}
+                            </li>
+                            <li>
+                                {% if record.get('date_of_payment') %}
+                                    Date of Payment: {{ record.get('date_of_payment') }}
+                                {% endif %}
+                            </li>
+                            <li>
+                                {% if record.get('date_cancelled') %}
+                                    Date Cancelled: {{ record.get('date_cancelled') }}
+                                {% endif %}
+                            </li>                            
+                        </ul>
+
+                        <!-- Display Products -->
+                        <strong>Products:</strong>
+                        <ul>
+                            {% for product in record.products %}
+                            <li>
+                                <strong>{{ product.product_name }}</strong> ({{ product.product_type }}): 
+                                Quantity: {{ product.quantity }}, Price: ${{ product.price }}, Total: ${{ product.total }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <!-- Display Charges -->
+                        <strong>Charges:</strong>
+                        <ul>
+                            {% for charge in record.charges %}
+                            <li>
+                                <strong>{{ charge.charge_name }}</strong>: 
+                                Quantity: {{ charge.quantity }}, Price: ${{ charge.price }}, Total: ${{ charge.total }}
+                            </li>
+                            {% else %}
+                            <li>No charges recorded.</li>
+                            {% endfor %}
+                        </ul>
+
+                        <!-- Display Deductions -->
+                        <strong>Deductions:</strong>
+                        <ul>
+                            {% for deduction in record.deductions %}
+                            <li>
+                                <strong>{{ deduction.deduction_name }}</strong>: 
+                                Quantity: {{ deduction.quantity }}, Price: ${{ deduction.price }}, Total: ${{ deduction.total }}
+                            </li>
+                            {% else %}
+                            <li>No deductions recorded.</li>
+                            {% endfor %}
+                        </ul>
+
+                        <!-- Display Totals -->
+                        <p><strong>Total Products Price:</strong> ${{ record.total_products_price }}</p>
+                        <p><strong>Total Charges:</strong> ${{ record.total_charges }}</p>
+                        <p><strong>Total Deductions:</strong> ${{ record.total_deductions }}</p>
+                        <p><strong>Net Total:</strong> ${{ record.total_products_price + record.total_charges - record.total_deductions }}</p>
+                    </div>
+                </td>
+                <td>
+                    <!-- Edit Icon -->
+                    <a href="{{ url_for('orders_blueprint.orders_edit', record_id=record['_id']) }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </a>
+                    <!-- Delete Icon -->
+                    <form action="{{ url_for('orders_blueprint.orders_delete', record_id=record['_id']) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No orders records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('orders_blueprint.orders_add') }}" class="btn btn-primary">Add New Order</a>
+</div>
 {% endblock %}
