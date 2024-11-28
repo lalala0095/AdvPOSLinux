@@ -1,24 +1,75 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
+<div class="container-orders">
+    <!-- <div class="row"> -->
         <!-- Add New Order Form -->
-        <div class="col-md-6">
-            <h5 class="mt-5">Add New Order</h5>
-            <form method="POST" action="{{ url_for('orders_blueprint.orders_add') }}">
+        <!-- <div class="col-md-6"> -->
+            <form class="form-group" method="POST" action="{{ url_for('orders_blueprint.orders_add') }}">
+                <h5 class="mt-5">Add New Order</h5>
                 {{ form.hidden_tag() }}
 
                 <!-- Date of Order Field -->
                 <div class="mb-3">
-                    {{ form.date_of_order.label(class="form.label") }}
+                    {{ form.date_of_order.label(class="form.label",  style="font-weight: bold;") }}
                     {{ form.date_of_order(class="form-control mb-2") }}
                 </div>
 
-                <!-- Products Section -->
+                <!-- Customer Section -->
+                 <div class="container-customer">
+                    {{ form.customer.label(class="form.label",  style="font-weight: bold;") }}
+                    <div class="mb-3" id="customer-form">
+                        
+                        {{ form.customer.customer_name.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.customer_name(class="form-control") }}
+    
+                        {{ form.customer.address.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.address(class="form-control") }}
+    
+                        {{ form.customer.shipping_address.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.shipping_address(class="form-control") }}
+    
+                        {{ form.customer.shipping_address.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.shipping_address(class="form-control") }}
+    
+                        {{ form.customer.company_name.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.company_name(class="form-control") }}
+    
+                        {{ form.customer.contact_number.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.contact_number(class="form-control") }}
+    
+                        {{ form.customer.email.label(class="form.label",  style="font-weight: normal;") }}
+                        {{ form.customer.email(class="form-control") }}
+                    </div>
+                 </div>
+
+
                 <div class="mb-3">
+                    {{ form.status.label(class="form.label",  style="font-weight: bold;") }}
+                    {{ form.status(class="form-control mb-2", id="status") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.custom_status.label(class="form.label",  style="font-weight: bold;") }}
+                    {{ form.custom_status(class="form-control mb-2") }}
+                </div>
+
+                <div id="date-sold-container" class="mb-3">
+                    {{ form.date_sold.label(class="form.label",  style="font-weight: bold;") }}
+                    {{ form.date_sold(class="form-control mb-2") }}    
+                </div>
+                <div id="date-cancelled-container" class="mb-3">
+                    {{ form.date_cancelled.label(class="form.label",  style="font-weight: bold;") }}
+                    {{ form.date_cancelled(class="form-control mb-2") }}
+                </div>
+                <div id="date-payment-container" class="mb-3">
+                    {{ form.date_of_payment.label(class="form.label",  style="font-weight: bold;") }}
+                    {{ form.date_of_payment(class="form-control mb-2") }}
+                </div>
+
+                <!-- Products Section -->
+                <div class="mb-4">
                     <div id="products-placeholder" class="d-flex justify-content-between align-items-center">
-                        <span>Products</span>
+                        <span  style="font-weight: bold;">Products</span>
                         <button type="button" class="btn btn-success btn-sm" id="add-product-btn">+</button>
                     </div>
                     <!-- Product Table -->
@@ -34,34 +85,65 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- {% for product in form.products %}
-                                <tr>
-                                    <td>{{ product.product_name(class="form-control") }}</td>
-                                    <td>{{ product.product_type(class="form-control") }}</td>
-                                    <td>{{ product.quantity(class="form-control") }}</td>
-                                    <td>{{ product.price(class="form-control") }}</td>
-                                    <td>{{ product.total(class="form-control", readonly="true") }}</td>
-                                    <td><button type="button" class="btn btn-danger remove-product-btn">Remove</button></td>
-                                </tr> -->
-                            {% endfor %}
+                            <!-- this is added dynamically by js -->
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Customer Section -->
-                <div class="mb-3">
-                    <label for="customer_name" class="form-label">Customer</label>  
-                    {{ form.customer_name(class="form-control mb-2") }}
-                </div>
-                
                 <input type="hidden" name="products" id="products-input" />
-
+                
+                <!-- Deductions Section -->
+                <div class="mb-4">
+                    <div id="deductions-placeholder" class="d-flex justify-content-between align-items-center">
+                        <span  style="font-weight: bold;">Deductions</span>
+                        <button type="button" class="btn btn-success btn-sm" id="add-deductions-btn">+</button>
+                    </div>
+                    <!-- Deductions Table -->
+                    <table class="table mt-3" id="deductions-table">
+                        <thead>
+                            <tr>
+                                <th>Deduction Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- this is added dynamically by js -->
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" name="deductions" id="deductions-input" />
+                
+                <!-- Charges Section -->
+                <div class="mb-4">
+                    <div id="charges-placeholder" class="d-flex justify-content-between align-items-center">
+                        <span  style="font-weight: bold;">Charges</span>
+                        <button type="button" class="btn btn-success btn-sm" id="add-charges-btn">+</button>
+                    </div>
+                    <!-- Charges Table -->
+                    <table class="table mt-3" id="charges-table">
+                        <thead>
+                            <tr>
+                                <th>Charge Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- this is added dynamically by js -->
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" name="charges" id="charges-input" />
+                
                 <!-- Submit Order Button -->
                 <button type="submit" class="btn btn-primary mt-3">Save Order</button>
                 <a href="{{ url_for('orders_blueprint.orders') }}" class="btn btn-secondary mt-3">Cancel</a>
             </form>
-        </div>
-    </div>
+        <!-- </div> -->
+    <!-- </div> -->
 </div>
 {% endblock %}
-        

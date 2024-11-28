@@ -53,26 +53,20 @@ footer {
     margin-bottom: 1rem;
 }
 
+.form-label {
+    gap: 40px;
+    font-weight: normal !important;
+}
+
 .form-control {
     border-radius: 0.25rem;
     border: 1px solid #ced4da;
     padding: 0.75rem;
-    font-size: 1rem;
+    /* font-size: 1rem; */
     transition: border-color 0.3s, box-shadow 0.3s;
+    margin-top: 10px;
 }
 
-.form-control:focus {
-    border-color: #66afe9;
-    box-shadow: 0 0 8px rgba(102, 175, 233, 0.6); /* Blue glow */
-}
-
-/* Styling for readonly form controls */
-.form-control[readonly] {
-    background-color: #f8f9fa; /* Light background to indicate inactivity */
-    border-color: #e0e0e0; /* Lighter border to show it's inactive */
-    color: #6c757d; /* Grayed text */
-    cursor: not-allowed; /* Indicate it's not clickable */
-}
 
 /* Optional: custom class to target readonly specifically */
 .readonly {
@@ -350,4 +344,19 @@ button {
 
 .btn-sm {
     padding: 5px 10px;
+}
+
+.mb-3 {
+    max-width: 500px;
+    font-weight: normal;
+}
+
+.container-orders {
+    display: flex;
+    justify-content: space-around;
+    align-items: start;
+}
+
+.customer-form {
+    font-weight: normal;
 }

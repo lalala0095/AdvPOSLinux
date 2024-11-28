@@ -36,6 +36,10 @@ def orders_add():
     if request.method == 'POST':
         print("form validated")        
         products_data = request.form.get('products')
+        deductions_data = request.form.get('deductions')
+        print(deductions_data)
+        charges_data = request.form.get('charges')
+        print(charges_data)
 
         products_count = products_data.count('product_name')
         products_data_final = []
@@ -48,22 +52,71 @@ def orders_add():
                 'total': request.form.get(f'products[{i}][total]'),
             }
             products_data_final.append(product)
-        
+
+        try:
+            charges_count = charges_data.count('charges_name')
+        except Exception as e:
+            print(e)
+            charges_count = 0
+        charges_data_final = []
+        for i in range(0, charges_count):  # Loop through the charge fields
+            charge = {
+                'charge_name': request.form.get(f'charges[{i}][charges_name]'),
+                'quantity': request.form.get(f'charges[{i}][quantity]'),
+                'price': request.form.get(f'charges[{i}][price]'),
+                'total': request.form.get(f'charges[{i}][total]'),
+            }
+            charges_data_final.append(charge)
+        try:
+            deductions_count = deductions_data.count('deductions_name')
+        except Exception as e:
+            print(e)
+            deductions_count = 0
+
+        deductions_data_final = []
+        for i in range(0, deductions_count):  # Loop through the deduction fields
+            deduction = {
+                'deduction_name': request.form.get(f'deductions[{i}][deductions_name]'),
+                'quantity': request.form.get(f'deductions[{i}][quantity]'),
+                'price': request.form.get(f'deductions[{i}][price]'),
+                'total': request.form.get(f'deductions[{i}][total]'),
+            }
+            deductions_data_final.append(deduction)
+
         # Ensure you have products data before proceeding
         if not products_data_final:
             flash("Please add at least one product.", "danger")
         else:
             total_price = []
+            total_deductions = []
+            total_charges = []
+
             for p in products_data_final:
                 total_price.append(float(p['total']))
             total_price = sum(total_price)
-            # total_price = None
+
+            for p in deductions_data_final:
+                total_deductions.append(float(p['total']))
+            total_deductions = sum(total_deductions)
+
+            for p in charges_data_final:
+                total_charges.append(float(p['total']))
+            total_charges = sum(total_charges)
+
             new_order = {
                 'date_inserted': datetime.now(),
                 'date_of_order': request.form.get('date_of_order'),
                 'products': products_data_final,
+                'total_products_price': total_price,
                 'customer': request.form.get('customer_name'),
-                'total_price': total_price,
+                'deductions': deductions_data_final,
+                'total_deductions': total_deductions,
+                'charges': charges_data_final,
+                'total_charges': total_charges,
+                'custom_status': request.form.get('custom_status'),
+                'date_sold': request.form.get('date_sold'),
+                'date_cancelled': request.form.get('date_cancelled'),
+                'date_of_payment': request.form.get('date_of_payment')
             }
             print(f"new order: {new_order}")
             try:
