@@ -116,7 +116,8 @@ def orders_add():
                 'custom_status': request.form.get('custom_status'),
                 'date_sold': request.form.get('date_sold'),
                 'date_cancelled': request.form.get('date_cancelled'),
-                'date_of_payment': request.form.get('date_of_payment')
+                'date_of_payment': request.form.get('date_of_payment'),
+                'net_price': (total_price + total_charges) - total_deductions
             }
             print(f"new order: {new_order}")
             try:
