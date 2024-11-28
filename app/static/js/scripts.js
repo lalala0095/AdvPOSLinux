@@ -58,7 +58,7 @@
                     <input type="text" name="products[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger remove-product-btn">Remove</button>
+                    <button id="remove-button" type="button" class="btn btn-danger remove-product-btn">Remove</button>
                 </td>
             `;
             productsTable.appendChild(newRow);
@@ -76,6 +76,8 @@
                 // Automatically add a new row if no rows remain
                 if (productsTable.children.length === 0) {
                     addProductRow();
+                    const removeButton = document.getElementsByName("products[0][remove-button]");
+                    removeButton.disabled = true;
                 }
             }
         });
@@ -96,6 +98,15 @@
             productsInput.value = JSON.stringify(products);
         });
 
+            // Enable or disable "Remove" buttons based on the number of rows
+        function toggleRemoveButtonState() {
+            const rows = productsTable.querySelectorAll("tr");
+            rows.forEach((row, index) => {
+                const removeButton = row.querySelector(".remove-product-btn");
+                removeButton.disabled = rows.length === 1; // Disable if it's the only row
+            });
+        }
+        
         // Automatically calculate totals for each row
         function attachRowListeners(row) {
             const quantityInput = row.querySelector("input[name*='[quantity]']");
@@ -144,17 +155,24 @@
                     <input type="text" name="products[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger remove-product-btn">Remove</button>
+                    <button name="products[${rowCount}][remove-button]" type="button" class="btn btn-danger remove-product-btn">Remove</button>
                 </td>
             `;
             productsTable.appendChild(newRow);
 
             attachRowListeners(newRow);
+            
+            if (productsTable.children.length === 0) {
+                addProductRow();
+                const removeButton = document.getElementsByName("products[0][remove-button]");
+                removeButton.disabled = true;            }
         }
 
         // Add an initial row if none exist
         if (productsTable.children.length === 0) {
             addProductRow();
+            const removeButton = document.getElementsByName("products[0][remove-button]");
+            removeButton.disabled = true;        
         }
     });
 

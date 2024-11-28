@@ -9,14 +9,8 @@
                 <h5 class="mt-5">Add New Order</h5>
                 {{ form.hidden_tag() }}
 
-                <!-- Date of Order Field -->
-                <div class="mb-3">
-                    {{ form.date_of_order.label(class="form.label",  style="font-weight: bold;") }}
-                    {{ form.date_of_order(class="form-control mb-2") }}
-                </div>
-
                 <!-- Customer Section -->
-                 <div class="container-customer">
+                 <div class="col-md-6 add-new-record">
                     {{ form.customer.label(class="form.label",  style="font-weight: bold;") }}
                     <div class="mb-3" id="customer-form">
                         
@@ -25,10 +19,7 @@
     
                         {{ form.customer.address.label(class="form.label",  style="font-weight: normal;") }}
                         {{ form.customer.address(class="form-control") }}
-    
-                        {{ form.customer.shipping_address.label(class="form.label",  style="font-weight: normal;") }}
-                        {{ form.customer.shipping_address(class="form-control") }}
-    
+        
                         {{ form.customer.shipping_address.label(class="form.label",  style="font-weight: normal;") }}
                         {{ form.customer.shipping_address(class="form-control") }}
     
@@ -43,33 +34,42 @@
                     </div>
                  </div>
 
+                <div class="col-md-6 add-new-record">
+                    <div class="mb-3">
+                        {{ form.status.label(class="form.label",  style="font-weight: bold;") }}
+                        {{ form.status(class="form-control mb-2", id="status") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.custom_status.label(class="form.label",  style="font-weight: bold;") }}
+                        {{ form.custom_status(class="form-control mb-2") }}
+                    </div>
+                </div>
 
-                <div class="mb-3">
-                    {{ form.status.label(class="form.label",  style="font-weight: bold;") }}
-                    {{ form.status(class="form-control mb-2", id="status") }}
-                </div>
-                <div class="mb-3">
-                    {{ form.custom_status.label(class="form.label",  style="font-weight: bold;") }}
-                    {{ form.custom_status(class="form-control mb-2") }}
-                </div>
+                <div class="col-md-6 add-new-record">
+                    <div class="mb-3">
+                        {{ form.date_of_order.label(class="form.label",  style="font-weight: bold;") }}
+                        {{ form.date_of_order(class="form-control mb-2") }}
+                    </div>
+    
+                    <div id="date-sold-container" class="mb-3">
+                        {{ form.date_sold.label(class="form.label",  style="font-weight: bold;") }}
+                        {{ form.date_sold(class="form-control mb-2") }}    
+                    </div>
+                    <div id="date-cancelled-container" class="mb-3">
+                        {{ form.date_cancelled.label(class="form.label",  style="font-weight: bold;") }}
+                        {{ form.date_cancelled(class="form-control mb-2") }}
+                    </div>
+                    <div id="date-payment-container" class="mb-3">
+                        {{ form.date_of_payment.label(class="form.label",  style="font-weight: bold;") }}
+                        {{ form.date_of_payment(class="form-control mb-2") }}
+                    </div>
 
-                <div id="date-sold-container" class="mb-3">
-                    {{ form.date_sold.label(class="form.label",  style="font-weight: bold;") }}
-                    {{ form.date_sold(class="form-control mb-2") }}    
-                </div>
-                <div id="date-cancelled-container" class="mb-3">
-                    {{ form.date_cancelled.label(class="form.label",  style="font-weight: bold;") }}
-                    {{ form.date_cancelled(class="form-control mb-2") }}
-                </div>
-                <div id="date-payment-container" class="mb-3">
-                    {{ form.date_of_payment.label(class="form.label",  style="font-weight: bold;") }}
-                    {{ form.date_of_payment(class="form-control mb-2") }}
                 </div>
 
                 <!-- Products Section -->
                 <div class="mb-4">
                     <div id="products-placeholder" class="d-flex justify-content-between align-items-center">
-                        <span  style="font-weight: bold;">Products</span>
+                        {{ form.products.label(class="form.label",  style="font-weight: bold;") }}
                         <button type="button" class="btn btn-success btn-sm" id="add-product-btn">+</button>
                     </div>
                     <!-- Product Table -->
@@ -94,7 +94,7 @@
                 <!-- Deductions Section -->
                 <div class="mb-4">
                     <div id="deductions-placeholder" class="d-flex justify-content-between align-items-center">
-                        <span  style="font-weight: bold;">Deductions</span>
+                        {{ form.deductions.label(class="form.label",  style="font-weight: bold;") }}
                         <button type="button" class="btn btn-success btn-sm" id="add-deductions-btn">+</button>
                     </div>
                     <!-- Deductions Table -->
@@ -118,7 +118,7 @@
                 <!-- Charges Section -->
                 <div class="mb-4">
                     <div id="charges-placeholder" class="d-flex justify-content-between align-items-center">
-                        <span  style="font-weight: bold;">Charges</span>
+                        {{ form.charges.label(class="form.label",  style="font-weight: bold;") }}
                         <button type="button" class="btn btn-success btn-sm" id="add-charges-btn">+</button>
                     </div>
                     <!-- Charges Table -->

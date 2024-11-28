@@ -3,7 +3,7 @@ from wtforms import StringField, FieldList, SubmitField, SelectField, FormField,
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, InputRequired
 
 class CustomerForm(FlaskForm):
-    customer_name = StringField("Customer Name (Optional)", validators=[Optional()])
+    customer_name = StringField("Customer Name", validators=[Optional()])
     address = StringField('Customer Address', validators=[Optional()])
     shipping_address = StringField('Shipping Address', validators=[Optional()])
     company_name = StringField('Company Name', validators=[Optional()])
@@ -49,9 +49,9 @@ class OrderForm(FlaskForm):
 class OrderForm(FlaskForm):
     date_of_order = DateField("Date Ordered", validators=[DataRequired()])
     products = FieldList(FormField(ProductForm), min_entries=1)
-    customer = FormField(CustomerForm, label="Customer Information")    
-    deductions = FieldList(FormField(Deductions), min_entries=0)
-    charges = FieldList(FormField(OtherChargesToCustomer), min_entries=0)
+    customer = FormField(CustomerForm, label="Customer Information (Optional)")    
+    deductions = FieldList(FormField(Deductions), min_entries=0, label="Deductions (Optional)")
+    charges = FieldList(FormField(OtherChargesToCustomer), min_entries=0, label="Charges to Customer (Optional)")
     total_price = DecimalField("Total Price", validators=[Optional()])
     submit = SubmitField("Submit Order")
     status = SelectField("Order Status", choices=[("", "Select Status"),
