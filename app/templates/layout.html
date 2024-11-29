@@ -69,6 +69,20 @@
                                         </li>
                                     </ul>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle {% if 'feedbacks_blueprint' in request.endpoint %}active{% endif %}" 
+                                    href="#" id="feedbacksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Feedbacks
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="feedbacksDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('feedbacks_blueprint.feedbacks_records') }}">View Feedbacks</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('feedbacks_blueprint.feedbacks_add') }}">Add Feedbacks</a>
+                                        </li>
+                                    </ul>
+                                </li>
                             </ul>
                         {% endif %}
                     {% endif %}

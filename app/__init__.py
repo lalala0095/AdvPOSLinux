@@ -6,6 +6,7 @@ from app.routes.products import products_blueprint
 from app.routes.main import main
 from app.routes.cogs import cogs_blueprint
 from app.routes.users import users_blueprint
+from app.routes.feedbacks import feedbacks_blueprint
 
 # Create the Flask app instance
 def create_app():
@@ -28,6 +29,7 @@ def create_app():
     app.register_blueprint(users_blueprint, url_prefix='/users')
     app.register_blueprint(cogs_blueprint, url_prefix='/cogs')
     app.register_blueprint(products_blueprint, url_prefix='/products')
+    app.register_blueprint(feedbacks_blueprint, url_prefix='/feedbacks')
 
     app.db = db
 

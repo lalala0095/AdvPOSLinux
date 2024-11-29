@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h5>Ticket Records</h5>
+
+    <!-- Table for displaying feedbacks records -->
+    <table class="table table-bfeedbacked">
+        <thead class="table-primary">
+            <tr>
+                <th>Ticket Number</th>
+                <th>Date Sent</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact Number</th>
+                <th>Type</th>
+                <th>Urgency</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th>Option</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in feedbacks_records %}
+            <tr>
+                <td>{{ record.feedback_id }}</td>
+                <td>{{ record.date_inserted }}</td>
+                <td>{{ record.client_name }}</td>
+                <td>{{ record.email }}</td>
+                <td>{{ record.contact_number }}</td>
+                <td>{{ record.feedback_type }}</td>
+                <td>{{ record.feedback_urgency }}</td>
+                <td>{{ record.details }}</td>
+                <td>{{ record.status }}</td>
+                <td>
+                    <!-- Delete Icon -->
+                    <form action="{{ url_for('feedbacks_blueprint.feedbacks_delete', record_id=record._id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No feedbacks found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('feedbacks_blueprint.feedbacks_add') }}" class="btn btn-primary">Add New Feedback</a>
+</div>
+{% endblock %}

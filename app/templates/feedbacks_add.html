@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4 feedbacks-add">
+    <div class="row">
+            <!-- Feedbacks Records Container -->
+        <div class="col-md-6 feedbacks-records">
+            <h5>Feedbacks Records</h5>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Date Sent</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact Number</th>
+                        <th>Type</th>
+                        <th>Urgency</th>
+                        <th>Details</th>
+                        <th>Status</th>                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in feedbacks_records %}
+                    <tr>
+                        <td>{{ record.feedback_id }}</td>
+                        <td>{{ record.date_inserted }}</td>
+                        <td>{{ record.client_name }}</td>
+                        <td>{{ record.email }}</td>
+                        <td>{{ record.contact_number }}</td>
+                        <td>{{ record.feedback_type }}</td>
+                        <td>{{ record.feedback_urgency }}</td>
+                        <td>{{ record.details }}</td>
+                        <td>{{ record.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="column">
+        <!-- Add Feedback Form Container -->
+        <div class="col-md-6 add-new-record">
+            <h5 class="mt-5">Add New Feedback</h5>
+            <form method="POST" action="{{ url_for('feedbacks_blueprint.feedbacks_add') }}">
+                {{ form.hidden_tag() }}
+                <div class="mb-3" id="customer-form">
+                    {{ form.client_name.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.client_name(class="form-control") }}
+    
+                    {{ form.email.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.email(class="form-control") }}
+
+                    {{ form.contact_number.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.contact_number(class="form-control") }}
+
+                    {{ form.feedback_type.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.feedback_type(class="form-control") }}
+
+                    {{ form.feedback_urgency.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.feedback_urgency(class="form-control") }}
+                    
+                    {{ form.details.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.details(class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary">Send Feedback</button>
+                <a href="{{ url_for('feedbacks_blueprint.feedbacks_records') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
