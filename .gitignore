@@ -7,6 +7,7 @@ app/static/css/*copy*
 app/static/js/*copy*
 app/forms/*copy*
 app/tests
+advpos.zip
 
 # Ignore .env file containing sensitive data
 .env
@@ -30,3 +31,7 @@ Dockerfile*
 .dockerignore
 
 paymongo
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

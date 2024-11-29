@@ -1,0 +1,34 @@
+# my custom files
+app/venv/*
+testings.ipynb
+app/templates/*copy*
+app/routes/*copy*
+app/static/css/*copy*
+app/static/js/*copy*
+app/forms/*copy*
+app/tests
+.gitignore
+.git
+
+# Ignore .env file containing sensitive data
+.env
+
+# Python-related files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environment directories
+venv/
+env/
+
+# IDEs and editor settings
+.vscode/
+.idea/
+
+# Docker-related
+Dockerfile*
+.dockerignore
+
+paymongo
