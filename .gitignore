@@ -8,6 +8,8 @@ app/static/js/*copy*
 app/forms/*copy*
 app/tests
 advpos.zip
+.ebextensions/app.config
+app/*copy*
 
 # Ignore .env file containing sensitive data
 .env
