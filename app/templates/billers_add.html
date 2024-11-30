@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4 billers-add">
+    <div class="row">
+            <!-- Billers Records Container -->
+        <div class="col-md-6 billers-records">
+            <h5>Billers Records</h5>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Biller Name</th>
+                        <th>Biller Type</th>
+                        <th>Custom Type</th>
+                        <th>Usual Due Date Day</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in billers_records %}
+                    <tr>
+                        <td>{{ record.biller_name }}</td>
+                        <td>{{ record.biller_type }}</td>
+                        <td>{{ record.custom_type }}</td>
+                        <td>{{ record.usual_due_day }}</td>
+                        <td>{{ record.remarks }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="column">
+        <!-- Add Biller Form Container -->
+        <div class="col-md-6 add-new-record">
+            <h5 class="mt-5">Add New Biller</h5>
+            <form method="POST" action="{{ url_for('billers_blueprint.billers_add') }}">
+                {{ form.hidden_tag() }}
+                <div class="mb-3" id="customer-form">
+                    {{ form.biller_name.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.biller_name(class="form-control") }}
+    
+                    {{ form.biller_type.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.biller_type(class="form-control") }}
+
+                    {{ form.custom_type.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.custom_type(class="form-control") }}
+
+                    {{ form.usual_due_day.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.usual_due_day(class="form-control") }}
+                    
+                    {{ form.remarks.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.remarks(class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary">Send Biller</button>
+                <a href="{{ url_for('billers_blueprint.billers_records') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

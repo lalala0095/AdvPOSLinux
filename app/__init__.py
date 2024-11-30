@@ -7,6 +7,8 @@ from app.routes.main import main
 from app.routes.cogs import cogs_blueprint
 from app.routes.users import users_blueprint
 from app.routes.feedbacks import feedbacks_blueprint
+from app.routes.bills import bills_blueprint
+from app.routes.billers import billers_blueprint
 
 # Create the Flask app instance
 def create_app():
@@ -30,6 +32,8 @@ def create_app():
     app.register_blueprint(cogs_blueprint, url_prefix='/cogs')
     app.register_blueprint(products_blueprint, url_prefix='/products')
     app.register_blueprint(feedbacks_blueprint, url_prefix='/feedbacks')
+    app.register_blueprint(bills_blueprint, url_prefix='/bills')
+    app.register_blueprint(billers_blueprint, url_prefix='/billers')
 
     app.db = db
 

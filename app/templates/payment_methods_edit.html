@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Products Record</h2>
+
+    <div class="col-md-6 add-new-cogs">
+        <h5 class="mt-5">Add New Cost of Goods</h5>
+        
+        <form method="POST" action="{{ url_for('cogs_blueprint.cogs_edit', record_id=record._id) }}">
+            {{ form.hidden_tag() }}
+
+            {% for field in form %}
+                {% if field.name != "submit" and field.name != 'csrf_token' %}
+                    <div class="form-group">
+                        {{ field.label }}
+                        {{ field(class="form-control") }}
+                        
+                        {% if field.errors %}
+                            <div class="text-danger">
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}  <!-- submit button -->
+                <a href="{{ url_for('cogs_blueprint.cogs_records') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+            
+        </form>
+    </div>
+
+</div>
+{% endblock %}

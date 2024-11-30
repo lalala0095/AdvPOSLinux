@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4 bills-add">
+    <div class="row">
+            <!-- Bills Records Container -->
+        <div class="col-md-6 bills-records">
+            <h5>Bills Records</h5>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Bill Name</th>
+                        <th>Urgency</th>
+                        <th>Due Date</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in bills_records %}
+                    <tr>
+                        <td>{{ record.bill_name }}</td>
+                        <td>{{ record.bill_urgency }}</td>
+                        <td>{{ record.due_date }}</td>
+                        <td>{{ record.remarks }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="column">
+        <!-- Add Bill Form Container -->
+        <div class="col-md-6 add-new-record">
+            <h5 class="mt-5">Add New Bill</h5>
+            <form method="POST" action="{{ url_for('bills_blueprint.bills_add') }}">
+                {{ form.hidden_tag() }}
+                <div class="mb-3" id="customer-form">
+                    {{ form.bill_name.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.bill_name(class="form-control") }}
+    
+                    {{ form.bill_urgency.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.bill_urgency(class="form-control") }}
+                    
+                    {{ form.due_date.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.due_date(class="form-control") }}
+
+                    {{ form.remarks.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.remarks(class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary">Send Bill</button>
+                <a href="{{ url_for('bills_blueprint.bills_records') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

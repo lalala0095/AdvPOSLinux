@@ -70,6 +70,26 @@
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle {% if 'bills_blueprint' in request.endpoint %}active{% endif %}" 
+                                    href="#" id="billsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Bills
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="billersDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('billers_blueprint.billers_add') }}">View Billers</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('billers_blueprint.billers_add') }}">Add Biller</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('bills_blueprint.bills_add') }}">View Bills</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('bills_blueprint.bills_add') }}">Add Bill</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle {% if 'feedbacks_blueprint' in request.endpoint %}active{% endif %}" 
                                     href="#" id="feedbacksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Feedbacks
@@ -128,16 +148,7 @@
             </div>
         </nav>
     </header>
-</head>
-<body>
-    
 
-
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-  
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <div class="container mt-3">
@@ -160,6 +171,16 @@
           </script>
     {% endif %}
     {% endwith %}
+    
+</head>
+<body>
+    
+
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
 
   <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
