@@ -4,6 +4,7 @@ from app.forms.forms import AccountForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.login_required import login_required
 from app.scripts.log import event_logging
+from datetime import datetime
 
 main = Blueprint('main', __name__)
 
@@ -20,6 +21,14 @@ def authenticate_user(username, password, db):
 @main.route("/")
 @login_required
 def index():
+    # Check if fbclid is in the query parameters
+    fbclid = request.args.get('fbclid')
+
+    if fbclid:
+        # If fbclid is present, you can log it, pass it on, or perform a redirect.
+        # Here we just append it to the URL and redirect to the same route without fbclid in the query
+        return redirect(url_for('main.index', _external=True))
+
     account_id = session.get('account_id')
     user_id = session.get('user_id')
 
@@ -132,6 +141,7 @@ def admin_signup():
         count_docs = db.accounts.count_documents({})
         
         new_record = {
+            'date_inserted': datetime.now(),
             'account_id': count_docs,
             'username': form.username.data.strip(),
             'password': hashed_password,
