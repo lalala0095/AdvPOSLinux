@@ -160,7 +160,6 @@ def bills_add():
             'biller': biller_object,
             'bill_urgency': form.bill_urgency.data,
             'amount': float(form.amount.data),
-            'allocation': float(form.allocation.data),
             'due_date': due_date,
             'remarks': form.remarks.data
         }
@@ -393,11 +392,27 @@ def bills_planners_add():
 
     form = BillsPlannerForm()
     
+    print("append choices to bills")
     populate_bills(form, bills_db)
 
     populate_cash_flows(form, cash_flows_db)
 
     return render_template('bills_planners_add.html', bills_db=bills_db, cash_flows_db=cash_flows_db, form=form)
+
+@bills_blueprint.route('/get_bills_amount', methods=['GET'])
+@login_required
+def get_bills_amount():
+    bill_name = request.args.get('bills')
+    if not bill_name:
+        return jsonify({"error": "Bill name is required"}), 400
+    
+    db = current_app.db
+    biller = db['bills'].find_one({"_id": ObjectId(bill_name)}, {"_id": 0, "amount": 1})
+    
+    if not biller:
+        return jsonify({"error": "Biller not found"}), 404
+    
+    return jsonify({"amount": biller.get('amount')})
 
 #------------
 

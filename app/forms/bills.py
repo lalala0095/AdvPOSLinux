@@ -73,7 +73,6 @@ class BillForm(FlaskForm):
     ], validators=[Optional()])
     due_date = DateField("Due Date", validators=[Optional()])
     amount = FloatField("Amount", validators=[Optional()])
-    allocation = FloatField("Allocation", default=0, validators=[Optional()])
     remarks = TextAreaField("Remarks", validators=[Optional()])
     submit = SubmitField("Submit")
 
@@ -96,14 +95,16 @@ def populate_biller(form):
 class BillsPlannerForm(FlaskForm):
     bills_planner_name = StringField("Bills", validators=[DataRequired()])
     bills = FieldList(SelectField("Bills", choices=[], validators=[DataRequired()]), min_entries=1)
+    amount = FloatField("Amount", default=0, validators=[Optional()])
+    allocation = FloatField("Allocation", default=0, validators=[Optional()])
     cash_flows = FieldList(SelectField("Cash Flows", choices=[], validators=[DataRequired()]), min_entries=1)
     submit = SubmitField("Submit")
 
-def populate_bills(form, cash_flows_db):
+def populate_bills(form, bills_db):
     choice_initial = ("", "Select one from Bills")
     choices = []
     choices.append(choice_initial)
-    for bill in cash_flows_db:
+    for bill in bills_db:
         print("appending")
         bill_id = str(bill['_id'])
         bill_item = f"{bill['biller']["biller_name"]} due on {pd.to_datetime(bill["due_date"]).strftime("%b %d")}"

@@ -31,31 +31,78 @@
 // });
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Get the bill name dropdown element
-    const billNameDropdown = document.getElementById('bill_name_dropdown');
-    const amountField = document.getElementById('amount_field');
+    const container = document.getElementById('bills-dropdown-container');
+    let rowIndex = 0; // Initialize index counter
 
-    // Event listener for change event on the dropdown
-    billNameDropdown.addEventListener('change', function () {
-        const selectedBill = billNameDropdown.value;
-        console.log("Selected bill name:", selectedBill);  // Debug log
-        
+    // Function to handle the dropdown change and fetch the amount
+    const handleDropdownChange = (dropdown, amountField) => {
+        const selectedBill = dropdown.value;
         if (selectedBill) {
-            // Make the API call using Fetch
-            fetch('/bills/get_amount?bill_name=' + encodeURIComponent(selectedBill))
-                .then(response => response.json())  // Parse the JSON response
+            fetch(`/bills/get_bills_amount?bills=${encodeURIComponent(selectedBill)}`)
+                .then(response => response.json())
                 .then(data => {
-                    console.log(data);  // Debug log for the response
-                    amountField.value = data.amount;  // Set the amount in the input field
+                    amountField.value = data.amount || 0; // Populate the amount field
                 })
-                .catch(error => {
-                    console.error("Error fetching amount:", error);
-                    alert("Failed to fetch amount: " + error.message);
-                });
+                .catch(error => console.error("Error fetching bill amount:", error));
         } else {
-            console.log("No bill selected");
+            amountField.value = ""; // Clear the amount field
         }
-    });
+    };
+
+    // Function to add a new row (dropdown + amount field)
+    const addNewRow = () => {
+        // Create a wrapper div for the new row
+        const newRow = document.createElement('div');
+        newRow.classList.add('mb-3');
+
+        // Create and append the "Bill" label
+        const billLabel = document.createElement('label');
+        billLabel.textContent = "Bill";
+        newRow.appendChild(billLabel);
+
+        // Clone the first existing dropdown (which is already populated by Flask)
+        const firstDropdown = document.querySelector('.bills-dropdown');
+        const clonedDropdown = firstDropdown.cloneNode(true);  // Clone the element
+        newRow.appendChild(clonedDropdown);
+
+        // Create and append the "Amount" label
+        const amountLabel = document.createElement('label');
+        amountLabel.textContent = "Amount";
+        newRow.appendChild(amountLabel);
+
+        // Create the amount field
+        const amountField = document.createElement('input');
+        amountField.type = "text";
+        amountField.classList.add('form-control', 'bills-amount-field');
+        amountField.readOnly = true;
+        newRow.appendChild(amountField);
+
+        // Add change event to fetch amount for the dropdown
+        clonedDropdown.addEventListener('change', function () {
+            handleDropdownChange(clonedDropdown, amountField);
+        });
+
+        // Add the new row to the container
+        container.appendChild(newRow);
+
+        // Increment the row index
+        rowIndex++;
+    };
+
+    // Add dynamic functionality to the first row (populated by Flask)
+    const firstDropdown = document.querySelector('.bills-dropdown');
+    const firstAmountField = firstDropdown.parentElement.querySelector('.bills-amount-field');
+    if (firstDropdown && firstAmountField) {
+        firstDropdown.addEventListener('change', function () {
+            handleDropdownChange(firstDropdown, firstAmountField);
+        });
+
+        // Trigger a change to fetch the initial amount (in case it's already selected)
+        handleDropdownChange(firstDropdown, firstAmountField);
+    }
+
+    // Add a new row only when the "Add" button is clicked
+    document.getElementById('add-bill-btn').addEventListener('click', addNewRow);
 });
 
 
@@ -492,20 +539,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (chargesTable.children.length === 0) {
         addChargesRow();
     }
-});
-
-// for bills planner
-document.getElementById('add-bill-btn').addEventListener('click', function () {
-    const container = document.getElementById('bills-dropdown-container');
-    const newField = container.firstElementChild.cloneNode(true);
-    container.appendChild(newField);
-});
-
-
-document.getElementById('add-cash-flow').addEventListener('click', function () {
-    const container = document.getElementById('cash-flows-container');
-    const clone = container.firstElementChild.cloneNode(true);
-    container.appendChild(clone);
 });
 
 // Safely pass Python data as JSON
