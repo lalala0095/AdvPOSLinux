@@ -30,6 +30,35 @@
 //     });
 // });
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Get the bill name dropdown element
+    const billNameDropdown = document.getElementById('bill_name_dropdown');
+    const amountField = document.getElementById('amount_field');
+
+    // Event listener for change event on the dropdown
+    billNameDropdown.addEventListener('change', function () {
+        const selectedBill = billNameDropdown.value;
+        console.log("Selected bill name:", selectedBill);  // Debug log
+        
+        if (selectedBill) {
+            // Make the API call using Fetch
+            fetch('/bills/get_amount?bill_name=' + encodeURIComponent(selectedBill))
+                .then(response => response.json())  // Parse the JSON response
+                .then(data => {
+                    console.log(data);  // Debug log for the response
+                    amountField.value = data.amount;  // Set the amount in the input field
+                })
+                .catch(error => {
+                    console.error("Error fetching amount:", error);
+                    alert("Failed to fetch amount: " + error.message);
+                });
+        } else {
+            console.log("No bill selected");
+        }
+    });
+});
+
+
 // products adding in orders form
 document.addEventListener('DOMContentLoaded', function () {
     const productsTable = document.querySelector("#products-table tbody");
@@ -463,6 +492,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (chargesTable.children.length === 0) {
         addChargesRow();
     }
+});
+
+// for bills planner
+document.getElementById('add-bill-btn').addEventListener('click', function () {
+    const container = document.getElementById('bills-dropdown-container');
+    const newField = container.firstElementChild.cloneNode(true);
+    container.appendChild(newField);
+});
+
+
+document.getElementById('add-cash-flow').addEventListener('click', function () {
+    const container = document.getElementById('cash-flows-container');
+    const clone = container.firstElementChild.cloneNode(true);
+    container.appendChild(clone);
 });
 
 // Safely pass Python data as JSON

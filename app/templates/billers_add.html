@@ -12,6 +12,7 @@
                         <th>Biller Name</th>
                         <th>Biller Type</th>
                         <th>Custom Type</th>
+                        <th>Amount</th>
                         <th>Usual Due Date Day</th>
                         <th>Remarks</th>
                     </tr>
@@ -22,6 +23,7 @@
                         <td>{{ record.biller_name }}</td>
                         <td>{{ record.biller_type }}</td>
                         <td>{{ record.custom_type }}</td>
+                        <td>{{ record.amount | currency }}</td>
                         <td>{{ record.usual_due_day }}</td>
                         <td>{{ record.remarks }}</td>
                     </tr>
@@ -34,7 +36,7 @@
         <!-- Add Biller Form Container -->
         <div class="col-md-6 add-new-record">
             <h5 class="mt-5">Add New Biller</h5>
-            <form method="POST" action="{{ url_for('billers_blueprint.billers_add') }}">
+            <form method="POST" action="{{ url_for('bills_blueprint.billers_add') }}">
                 {{ form.hidden_tag() }}
                 <div class="mb-3" id="customer-form">
                     {{ form.biller_name.label(class="form.label",  style="font-weight: normal;") }}
@@ -42,6 +44,9 @@
     
                     {{ form.biller_type.label(class="form.label",  style="font-weight: normal;") }}
                     {{ form.biller_type(class="form-control") }}
+
+                    {{ form.amount.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.amount(class="form-control") }}
 
                     {{ form.custom_type.label(class="form.label",  style="font-weight: normal;") }}
                     {{ form.custom_type(class="form-control") }}
@@ -53,7 +58,7 @@
                     {{ form.remarks(class="form-control") }}
                 </div>
                 <button type="submit" class="btn btn-primary">Send Biller</button>
-                <a href="{{ url_for('billers_blueprint.billers_records') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('bills_blueprint.billers_records') }}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>

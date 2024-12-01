@@ -10,6 +10,8 @@
                 <thead class="table-primary">
                     <tr>
                         <th>Bill Name</th>
+                        <th>Amount</th>
+                        <th>Allocation</th>
                         <th>Urgency</th>
                         <th>Due Date</th>
                         <th>Remarks</th>
@@ -18,7 +20,9 @@
                 <tbody>
                     {% for record in bills_records %}
                     <tr>
-                        <td>{{ record.bill_name }}</td>
+                        <td>{{ record.biller_name }}</td>
+                        <td>{{ record.amount | currency }}</td>
+                        <td>{{ record.allocation | currency }}</td>
                         <td>{{ record.bill_urgency }}</td>
                         <td>{{ record.due_date }}</td>
                         <td>{{ record.remarks }}</td>
@@ -36,8 +40,14 @@
                 {{ form.hidden_tag() }}
                 <div class="mb-3" id="customer-form">
                     {{ form.bill_name.label(class="form.label",  style="font-weight: normal;") }}
-                    {{ form.bill_name(class="form-control") }}
+                    {{ form.bill_name(class="form-control", id="bill_name_dropdown") }}
     
+                    {{ form.amount.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.amount(class="form-control", id="amount_field", readonly="readonly" ) }}
+
+                    {{ form.allocation.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.allocation(class="form-control") }}
+
                     {{ form.bill_urgency.label(class="form.label",  style="font-weight: normal;") }}
                     {{ form.bill_urgency(class="form-control") }}
                     

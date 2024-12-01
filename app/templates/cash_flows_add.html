@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4 cash_flows-add">
+    <div class="row">
+            <!-- Cash Flows Records Container -->
+        <div class="col-md-6 cash_flows-records">
+            <h5>Cash Flows Records</h5>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Cash Flow Name</th>
+                        <th>Type</th>
+                        <th>Custom Type</th>
+                        <th>Usual Income Day</th>
+                        <th>Possible Next Income Date</th>
+                        <th>Amount</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in cash_flows_records %}
+                    <tr>
+                        <td>{{ record.cash_flow_name }}</td>
+                        <td>{{ record.cash_flow_type }}</td>
+                        <td>{{ record.custom_type }}</td>
+                        <td>{{ record.usual_income_day }}</td>
+                        <td>{{ record.possible_next_month_date }}</td>
+                        <td>{{ record.amount | currency }}</td>
+                        <td>{{ record.remarks }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="column">
+        <!-- Add Cash Flow Form Container -->
+        <div class="col-md-6 add-new-record">
+            <h5 class="mt-5">Add New Cash Flow</h5>
+            <form method="POST" action="{{ url_for('bills_blueprint.cash_flows_add') }}">
+                {{ form.hidden_tag() }}
+                <div class="mb-3" id="customer-form">
+                    {{ form.cash_flow_name.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.cash_flow_name(class="form-control") }}
+    
+                    {{ form.cash_flow_type.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.cash_flow_type(class="form-control") }}
+
+                    {{ form.custom_type.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.custom_type(class="form-control") }}
+
+                    {{ form.usual_income_day.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.usual_income_day(class="form-control") }}
+
+                    {{ form.amount.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.amount(class="form-control") }}
+
+                    {{ form.remarks.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.remarks(class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary">Send Cash Flow</button>
+                <a href="{{ url_for('bills_blueprint.cash_flows_records') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
