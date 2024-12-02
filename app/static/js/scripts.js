@@ -30,81 +30,208 @@
 //     });
 // });
 
+// for planner
 document.addEventListener('DOMContentLoaded', function () {
-    const container = document.getElementById('bills-dropdown-container');
-    let rowIndex = 0; // Initialize index counter
+    const addBillButton = document.getElementById('add-bill-btn');
+    const selectedBillsTable = document.getElementById('selected-bills-table');
+    const billDropdown = document.querySelector('.bills-dropdown');
+    const amountField = document.querySelector('.bills-amount-field');
+    const allocationField = document.getElementById('bills-allocation');
 
-    // Function to handle the dropdown change and fetch the amount
-    const handleDropdownChange = (dropdown, amountField) => {
-        const selectedBill = dropdown.value;
-        if (selectedBill) {
-            fetch(`/bills/get_bills_amount?bills=${encodeURIComponent(selectedBill)}`)
-                .then(response => response.json())
-                .then(data => {
-                    amountField.value = data.amount || 0; // Populate the amount field
-                })
-                .catch(error => console.error("Error fetching bill amount:", error));
-        } else {
-            amountField.value = ""; // Clear the amount field
-        }
-    };
+    const addCashFlowButton = document.getElementById('add-cash-flow-btn');
+    const selectedCashFlowsTable = document.getElementById('selected-cash-flows-table');
+    const cashFlowDropdown = document.querySelector('.cash-flows-dropdown');
+    const cfamountField = document.getElementById('cash-flows-amount-field');
 
-    // Function to add a new row (dropdown + amount field)
-    const addNewRow = () => {
-        // Create a wrapper div for the new row
-        const newRow = document.createElement('div');
-        newRow.classList.add('mb-3');
+    const totalsField = document.getElementById('totals-amount-field');
+    const cashFlowTotalsField = document.getElementById('total-cash-flows-amount-field');
+    const cashFlowMinusBillsField = document.getElementById('total-cash-flows-minus-bills');
 
-        // Create and append the "Bill" label
-        const billLabel = document.createElement('label');
-        billLabel.textContent = "Bill";
-        newRow.appendChild(billLabel);
+    let rowIndex = 1; // Start from 1 to correctly reference the first row
 
-        // Clone the first existing dropdown (which is already populated by Flask)
-        const firstDropdown = document.querySelector('.bills-dropdown');
-        const clonedDropdown = firstDropdown.cloneNode(true);  // Clone the element
-        newRow.appendChild(clonedDropdown);
-
-        // Create and append the "Amount" label
-        const amountLabel = document.createElement('label');
-        amountLabel.textContent = "Amount";
-        newRow.appendChild(amountLabel);
-
-        // Create the amount field
-        const amountField = document.createElement('input');
-        amountField.type = "text";
-        amountField.classList.add('form-control', 'bills-amount-field');
-        amountField.readOnly = true;
-        newRow.appendChild(amountField);
-
-        // Add change event to fetch amount for the dropdown
-        clonedDropdown.addEventListener('change', function () {
-            handleDropdownChange(clonedDropdown, amountField);
+    // Handle dropdown change and autofill amount
+    if (billDropdown) {
+        billDropdown.addEventListener('change', function () {
+            const selectedBill = billDropdown.value;
+            if (selectedBill) {
+                fetch(`/bills/get_bills_amount?bills=${encodeURIComponent(selectedBill)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        amountField.value = data.amount || 0; // Populate the amount field
+                        allocationField.value = "";
+                    })
+                    .catch(error => console.error("Error fetching bill amount:", error));
+            } else {
+                amountField.value = ""; // Clear the amount field
+                allocationField.value = "";
+            }
         });
-
-        // Add the new row to the container
-        container.appendChild(newRow);
-
-        // Increment the row index
-        rowIndex++;
-    };
-
-    // Add dynamic functionality to the first row (populated by Flask)
-    const firstDropdown = document.querySelector('.bills-dropdown');
-    const firstAmountField = firstDropdown.parentElement.querySelector('.bills-amount-field');
-    if (firstDropdown && firstAmountField) {
-        firstDropdown.addEventListener('change', function () {
-            handleDropdownChange(firstDropdown, firstAmountField);
-        });
-
-        // Trigger a change to fetch the initial amount (in case it's already selected)
-        handleDropdownChange(firstDropdown, firstAmountField);
     }
 
-    // Add a new row only when the "Add" button is clicked
-    document.getElementById('add-bill-btn').addEventListener('click', addNewRow);
+    // Handle dropdown change and autofill cash flow amount
+    if (cashFlowDropdown) {
+        cashFlowDropdown.addEventListener('change', function () {
+            const selectedBill = cashFlowDropdown.value;
+            if (selectedBill) {
+                fetch(`/bills/get_cash_flows_amount?cash_flows=${encodeURIComponent(selectedBill)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        cfamountField.value = data.amount || 0; // Populate the amount field
+                    })
+                    .catch(error => console.error("Error fetching bill amount:", error));
+            } else {
+                cfamountField.value = ""; // Clear the amount field
+            }
+        });
+    }
+
+    // Add a new bill to the table
+    addBillButton.addEventListener('click', function () {
+        const selectedBill = billDropdown.value;
+        const amount = amountField.value;
+        const allocation = allocationField.value;
+
+        if (selectedBill && amount) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${billDropdown.options[billDropdown.selectedIndex].text}</td>
+                <td>${amount}</td>
+                <td class="allocation-cell">${allocation}</td>
+                <td><button type="button" class="btn btn-danger remove-btn">x</button></td>
+            `;
+
+            // Add the remove button functionality
+            const removeButton = row.querySelector('.remove-btn');
+            removeButton.addEventListener('click', function () {
+                row.remove(); // Remove the row from the table
+            });
+
+            // Add the row to the table
+            selectedBillsTable.appendChild(row);
+
+            allocationField.value = ""; 
+
+            updateTotal();
+
+        }
+    });
+
+    // Add a new cash flow to the table
+    addCashFlowButton.addEventListener('click', function () {
+        const selectedCashFlowsTable = document.getElementById('selected-cash-flows-table');
+        const amount = cfamountField.value;
+
+        if (selectedCashFlowsTable && amount) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${cashFlowDropdown.options[cashFlowDropdown.selectedIndex].text}</td>
+                <td class="cash-flow-amount-cell">${amount}</td>
+                <td><button type="button" class="btn btn-danger remove-btn">x</button></td>
+            `;
+
+            // Add the remove button functionality
+            const removeButton = row.querySelector('.remove-btn');
+            removeButton.addEventListener('click', function () {
+                row.remove(); // Remove the row from the table
+            });
+
+            // Add the row to the table
+            selectedCashFlowsTable.appendChild(row);
+            updateTotal();
+        }
+    });
+    
+    // Update the total allocation
+    function updateTotal() {
+        let total = 0;
+        let cashFlowTotal = 0;
+        let cashFlowMinusTotalBills = 0;
+
+        // Select all cells containing the allocations
+        const allocationCells = document.querySelectorAll('.allocation-cell');
+        const cashFlowCells = document.querySelectorAll('.cash-flow-amount-cell');
+        allocationCells.forEach(function(cell) {
+            const allocation = parseFloat(cell.textContent) || 0; // Get the allocation value, default to 0
+            console.log(allocation)
+            total += allocation;
+        });
+
+        cashFlowCells.forEach(function(cell) {
+            const cashFlowAmount = parseFloat(cell.textContent) || 0; // Get the allocation value, default to 0
+            console.log(cashFlowAmount)
+            cashFlowTotal += cashFlowAmount;
+        });
+
+        // Update the totals field with the calculated total
+        totalsField.value = total.toFixed(2);
+        cashFlowTotalsField.value =  cashFlowTotal.toFixed(2);
+        total_value_final = "₱" + total.toFixed(2);
+        total_cashflow_value_final = "₱" + cashFlowTotal.toFixed(2);
+        
+        totalsField.value = "₱" + total.toFixed(2);
+        cashFlowTotalsField.value = total_cashflow_value_final;
+
+        cashFlowMinusBillsField.value = "₱" + (cashFlowTotal - total).toFixed(2);
+    }
 });
 
+
+//  for bills_add
+document.addEventListener('DOMContentLoaded', function () {
+    // Get the bill name dropdown element
+    const billNameDropdown = document.getElementById('bill_name_dropdown');
+    const amountField = document.getElementById('amount_field');
+    const billsDropdown = document.getElementById('bills_dropdown');
+    const billsAmountField = document.getElementById('bills_amount_field');
+
+    // Event listener for change event on the dropdown
+    if (billNameDropdown) {
+        billNameDropdown.addEventListener('change', function () {
+            const selectedBill = billNameDropdown.value;
+            console.log("Selected bill name:", selectedBill);  // Debug log
+            
+            if (selectedBill) {
+                // Make the API call using Fetch
+                fetch('/bills/get_amount?bill_name=' + encodeURIComponent(selectedBill))
+                    .then(response => response.json())  // Parse the JSON response
+                    .then(data => {
+                        console.log(data);  // Debug log for the response
+                        amountField.value = data.amount;  // Set the amount in the input field
+                    })
+                    .catch(error => {
+                        console.error("Error fetching amount:", error);
+                        alert("Failed to fetch amount: " + error.message);
+                    });
+            } else {
+                console.log("No bill selected");
+            }
+        });    
+    }
+
+    // Event listener for change event on the dropdown
+    if (billsDropdown) {
+        billsDropdown.addEventListener('change', function () {
+            const selectedBill = billsDropdown.value;
+            console.log("Selected bill name:", selectedBill);  // Debug log
+            
+            if (selectedBill) {
+                // Make the API call using Fetch
+                fetch('/bills/get_bills_amount?bills=' + encodeURIComponent(selectedBill))
+                    .then(response => response.json())  // Parse the JSON response
+                    .then(data => {
+                        console.log(data);  // Debug log for the response
+                        billsAmountField.value = data.amount;  // Set the amount in the input field
+                    })
+                    .catch(error => {
+                        console.error("Error fetching amount:", error);
+                        alert("Failed to fetch amount: " + error.message);
+                    });
+            } else {
+                console.log("No bill selected");
+            }
+        });
+    }
+});
 
 // products adding in orders form
 document.addEventListener('DOMContentLoaded', function () {
@@ -134,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" name="products[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
             </td>
             <td>
-                <button id="remove-button" type="button" class="btn btn-danger remove-product-btn">Remove</button>
+                <button id="remove-button" type="button" class="btn btn-danger remove-product-btn">x</button>
             </td>
         `;
         productsTable.appendChild(newRow);
@@ -231,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" name="products[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
             </td>
             <td>
-                <button name="remove-product-btn" type="button" class="btn btn-danger remove-product-btn">Remove</button>
+                <button name="remove-product-btn" type="button" class="btn btn-danger remove-product-btn">x</button>
             </td>
         `;
         productsTable.appendChild(newRow);
@@ -322,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" name="deductions[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
             </td>
             <td>
-                <button type="button" class="btn btn-danger remove-deductions-btn">Remove</button>
+                <button type="button" class="btn btn-danger remove-deductions-btn">x</button>
             </td>
         `;
         deductionsTable.appendChild(newRow);
@@ -404,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" name="deductions[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
             </td>
             <td>
-                <button type="button" class="btn btn-danger remove-deductions-btn">Remove</button>
+                <button type="button" class="btn btn-danger remove-deductions-btn">x</button>
             </td>
         `;
         deductionsTable.appendChild(newRow);
@@ -445,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" name="charges[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
             </td>
             <td>
-                <button type="button" class="btn btn-danger remove-charges-btn">Remove</button>
+                <button type="button" class="btn btn-danger remove-charges-btn">x</button>
             </td>
         `;
         chargesTable.appendChild(newRow);
@@ -527,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" name="charges[${rowCount}][total]" class="form-control" placeholder="Total" readonly />
             </td>
             <td>
-                <button type="button" class="btn btn-danger remove-charges-btn">Remove</button>
+                <button type="button" class="btn btn-danger remove-charges-btn">x</button>
             </td>
         `;
         chargesTable.appendChild(newRow);

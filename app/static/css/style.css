@@ -35,6 +35,11 @@ main {
     box-sizing: border-box; /* Ensure padding doesn't add to total width */
 }
 
+input[readonly] {
+    background-color: #d3d3d3;  /* Light gray color */
+    color: #000;  /* Optional: keep the text color readable */
+}
+
 /* Footer should also span full width */
 footer {
     width: 100%;
@@ -54,7 +59,6 @@ footer {
 }
 
 .form-label {
-    gap: 40px;
     font-weight: normal !important;
 }
 
@@ -211,7 +215,7 @@ button {
 .row {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    padding: 10px;
 }
 
 
@@ -297,27 +301,6 @@ button {
     cursor: pointer;
 }
 
-/* 
-@media (max-width: 1200px) {
-    .container-dashboard {
-        grid-template-columns: repeat(3, 1fr); 
-    }
-}
-
-@media (max-width: 768px) {
-    .container-dashboard {
-        grid-template-columns: repeat(2, 1fr); 
-    }
-}
-
-@media (max-width: 480px) {
-    .container-dashboard {
-        grid-template-columns: 1fr; 
-    }
-} */
-
-
-
 /* Overlay styling */
 .overlay {
     position: fixed;
@@ -360,4 +343,9 @@ button {
 
 .customer-form {
     font-weight: normal;
+}
+
+
+.column {
+    margin: 20px;
 }

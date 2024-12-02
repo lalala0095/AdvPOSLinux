@@ -391,7 +391,7 @@ def bills_planners_add():
     )) 
 
     form = BillsPlannerForm()
-    
+    print(form)
     print("append choices to bills")
     populate_bills(form, bills_db)
 
@@ -411,6 +411,21 @@ def get_bills_amount():
     
     if not biller:
         return jsonify({"error": "Biller not found"}), 404
+    
+    return jsonify({"amount": biller.get('amount')})
+
+@bills_blueprint.route('/get_cash_flows_amount', methods=['GET'])
+@login_required
+def get_cash_flows_amount():
+    cash_flows_name = request.args.get('cash_flows')
+    if not cash_flows_name:
+        return jsonify({"error": "Cash Flow name is required"}), 400
+    
+    db = current_app.db
+    biller = db['cash_flows'].find_one({"_id": ObjectId(cash_flows_name)}, {"_id": 0, "amount": 1})
+    
+    if not biller:
+        return jsonify({"error": "Cash Flow not found"}), 404
     
     return jsonify({"amount": biller.get('amount')})
 

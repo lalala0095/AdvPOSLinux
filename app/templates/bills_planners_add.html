@@ -1,30 +1,114 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container-bills_planners">
-    <!-- Add New Bill Form -->
-    <form class="form-group" method="POST" action="{{ url_for('bills_blueprint.bills_planners_add') }}">
-        <div id="bills-dropdown-container">
-            <h5>Add your Bills</h5>
-            <!-- Initial Row (will be removed dynamically on page load) -->
-            <div class="mb-3">
-                <label>Bill</label>
-                <select name="bills[]" class="form-control bills-dropdown">
-                    <option value="">Select a bill</option>
-                    {% for bill in bills_db %}
-                        <option value="{{ bill['_id'] }}">
-                            {{ bill['biller']['biller_name'] }} due on {{ bill['due_date'].strftime('%b %d') }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <label>Amount</label>
-                <input type="text" class="form-control bills-amount-field" readonly />
+<div class="bills-planner-page">
+    <div class="container">
+        <div class="column" style="border: 1px solid black;">
+            <div class="col-md-6">
+                <div class="row">
+                    <h5>Planner Totals</h5>
+                    <label>Total Bills Amount</label>
+                    <input type="text" class="form-control totals-amount-field" id='totals-amount-field' readonly value="Add Bills to Calculate"/>
+                </div>
+                <div class="row">
+                    <label>Total Cash Flows Amount</label>
+                    <input type="text" class="form-control total-cash-flows-amount-field" id='total-cash-flows-amount-field' readonly value="Add Cash Flows to Calculate"/>
+                </div>
+                <div class="row">      
+                    <label>Cash Flow Remaining Less Bills Amount</label>
+                    <input type="text" class="form-control total-cash-flows-minus-bills" id='total-cash-flows-minus-bills' readonly value="Cash Flow - Bills Placeholder"/>                        
+                </div>
             </div>
         </div>
-        <!-- Button to add new rows -->
-        <button type="button" class="btn btn-success btn-sm" id="add-bill-btn">+</button>
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary mt-3">Save Bills Planner</button>
-    </form>
+        <div class="row">
+            <!-- Left Section (Form) -->
+            <div class="row" style="border: 1px solid black;">
+                <div class="col-md-6">
+                    <h5>Add Bills to Planner</h5>
+                    <form class="form-group" method="POST" action="{{ url_for('bills_blueprint.bills_planners_add') }}">
+                        <div class="mb-3">
+                            <label>Bill</label>
+                            <select name="bills[]" class="form-control bills-dropdown">
+                                <option value="">Select a bill</option>
+                                {% for bill in bills_db %}
+                                    <option value="{{ bill['_id'] }}">
+                                        {{ bill['biller']['biller_name'] }} due on {{ bill['due_date'].strftime('%b %d') }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Amount (Auto Fillup)</label>
+                            <input type="text" class="form-control bills-amount-field" readonly />
+                        </div>
+                        <div class="mb-3">
+                            <label>Set your Budget</label>
+                            <input type="text" class="form-control bills-allocation" id="bills-allocation" />
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm" id="add-bill-btn">+</button>
+                    </form>
+                </div>
+
+                <!-- Right Section (Table) -->
+                <div class="col-md-6">
+                    <h5>Selected Bills</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Bill</th>
+                                <th>Amount</th>
+                                <th>Budget Allocation</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="selected-bills-table">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row" style="border: 1px solid black;">
+                <!-- Next Section Cash Flow -->
+                <div class="col-md-6">
+                    <h5>Add Cash Flows to Planner</h5>
+                        <div class="mb-3">
+                            <label>Cash Flow</label>
+                            <select name="cash-flow[]" class="form-control cash-flows-dropdown">
+                                <option value="">Select a Cash Flow</option>
+                                {% for cash_flow in cash_flows_db %}
+                                    <option value="{{ cash_flow['_id'] }}">
+                                        {{ cash_flow['cash_flow_name'] }} on {{ cash_flow['possible_next_month_date'].strftime('%b %d') }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Amount (Auto Fillup)</label>
+                            <input type="text" class="form-control cash-flows-amount-field" id="cash-flows-amount-field" readonly />
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm" id="add-cash-flow-btn">+</button>
+                </div>
+                
+                <!-- Right Section (Table) -->
+                <div class="col-md-6">
+                    <h5>Selected Cash Flows</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cash Flows</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="selected-cash-flows-table">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 {% endblock %}
