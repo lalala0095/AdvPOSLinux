@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">{{ bills_planner_object.name }}</h1>
+    <hr>
+
+    <!-- Summary Section -->
+    <div class="mb-4">
+        <h3>Summary</h3>
+        <p><strong>Date Created</strong> {{ bills_planner_object.date_inserted.strftime("%b %d, %Y") }}</p>
+        <p><strong>Total Bills:</strong> {{ bills_planner_object.total_bills_amount | currency }}</p>
+        <p><strong>Total Cash Flows:</strong> {{ bills_planner_object.total_cash_flows_amount | currency }}</p>
+        <p><strong>Remaining Funds After Bills Payment:</strong> {{ bills_planner_object.bills_minus_cash_flows | currency }}</p>
+    </div>
+
+    <!-- Bills Section -->
+    <div class="mb-4">
+        <h3>Bills Overview</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Bill Name</th>
+                    <th>Amount</th>
+                    <th>Allocation</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills_planner_object.bills %}
+                <tr>
+                    <td>{{ bill.bill_name }}</td>
+                    <td>{{ bill.amount | currency }}</td>
+                    <td>{{ bill.allocation | currency }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Cash Flows Section -->
+    <div class="mb-4">
+        <h3>Cash Flows</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Cash Flow Name</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cash_flow in bills_planner_object.cash_flows %}
+                <tr>
+                    <td>{{ cash_flow.cash_flow_name }}</td>
+                    <td>{{ cash_flow.amount | currency }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

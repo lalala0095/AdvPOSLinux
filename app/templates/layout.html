@@ -84,8 +84,19 @@
                                         <li>
                                             <a class="dropdown-item" href="{{ url_for('bills_blueprint.bills_add') }}">Bills</a>
                                         </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle {% if 'bills_blueprint' in request.endpoint %}active{% endif %}" 
+                                    href="#" id="billsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Planners
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="plannersDropdown">
                                         <li>
-                                            <a class="dropdown-item" href="{{ url_for('bills_blueprint.bills_planners_add') }}">Bills Allocations Planner</a>
+                                            <a class="dropdown-item" href="{{ url_for('bills_blueprint.bills_planners_records') }}">Bills Allocations Planner</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('bills_blueprint.bills_planners_add') }}">Add Bills Allocations Planner</a>
                                         </li>
                                     </ul>
                                 </li>

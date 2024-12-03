@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask import current_app
-from wtforms import StringField, SubmitField, SelectField, TextAreaField, IntegerField, DateField, FloatField, FieldList
+from wtforms import StringField, SubmitField, SelectField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField
 from wtforms.validators import DataRequired, EqualTo, Length, Optional, NumberRange
 from datetime import datetime
 from bson import ObjectId
@@ -92,39 +92,48 @@ def populate_biller(form):
 #     if amount:
 #         form.amount.data = amount
 
-class BillsPlannerForm(FlaskForm):
-    bills_planner_name = StringField("Bills", validators=[DataRequired()])
-    bills = FieldList(SelectField("Bills", choices=[], validators=[DataRequired()]), min_entries=1)
+class BillsPlannerBillsForm(FlaskForm):
+    bill_id = StringField("Bill ID", validators=[DataRequired()])
+    bill_name = StringField("Bill Name", validators=[Optional()])
     amount = FloatField("Amount", default=0, validators=[Optional()])
-    allocation = FloatField("Allocation", default=0, validators=[Optional()])
-    cash_flows = FieldList(SelectField("Cash Flows", choices=[], validators=[DataRequired()]), min_entries=1)
+    allocation = FloatField("Budget Allocation", default=0, validators=[Optional()])
+    class Meta:
+        csrf = False
+
+class BillsPlannerCashFlowsForm(FlaskForm):
+    cash_flow_id = StringField("Cash Flow ID", validators=[DataRequired()])
+    cash_flow_name = StringField("Cash Flow Name", validators=[Optional()])
+    amount = FloatField("Amount", default=0, validators=[Optional()])
+    class Meta:
+        csrf = False
+
+class BillsPlannerForm(FlaskForm):
+    bills_planner_name = StringField("Bills Planner Name", validators=[DataRequired()])
+    bills = FieldList(FormField(BillsPlannerBillsForm), label="Bills", min_entries=1)
+    cash_flows = FieldList(FormField(BillsPlannerCashFlowsForm), label="Cash Flows", min_entries=1)    
     submit = SubmitField("Submit")
 
-def populate_bills(form, bills_db):
-    choice_initial = ("", "Select one from Bills")
-    choices = []
-    choices.append(choice_initial)
-    for bill in bills_db:
-        print("appending")
-        bill_id = str(bill['_id'])
-        bill_item = f"{bill['biller']["biller_name"]} due on {pd.to_datetime(bill["due_date"]).strftime("%b %d")}"
-        bill_tuple = (bill_id, bill_item)
-        print(bill_tuple)
-        choices.append(bill_tuple) 
-    form.bills[0].choices = choices
-    print(choices)
+# def populate_bills(form, bills_db):
+#     choice_initial = ("", "Select one from Bills")
+#     choices = []
+#     choices.append(choice_initial)
+#     for bill in bills_db:
+#         bill_id = str(bill['_id'])
+#         bill_item = f"{bill['biller']["biller_name"]} due on {pd.to_datetime(bill["due_date"]).strftime("%b %d")}"
+#         bill_tuple = (bill_id, bill_item)
+#         choices.append(bill_tuple) 
+#     form.bills[0].choices = choices
 
 
-def populate_cash_flows(form, cash_flows_db):
-    choice_initial = ("", "Select one from Cash Flows")
-    choices = []
-    choices.append(choice_initial)
-    for bill in cash_flows_db:
-        bill_id = str(bill['_id'])
-        bill_item = f"{bill["cash_flow_name"]} on {pd.to_datetime(bill["possible_next_month_date"]).strftime("%b %d")}"
-        bill_tuple = (bill_id, bill_item)
-        print(bill_tuple)
-        choices.append(bill_tuple) 
-    form.cash_flows[0].choices = choices
-    print(choices)
+
+# def populate_cash_flows(form, cash_flows_db):
+#     choice_initial = ("", "Select one from Cash Flows")
+#     choices = []
+#     choices.append(choice_initial)
+#     for bill in cash_flows_db:
+#         bill_id = str(bill['_id'])
+#         bill_item = f"{bill["cash_flow_name"]} on {pd.to_datetime(bill["possible_next_month_date"]).strftime("%b %d")}"
+#         bill_tuple = (bill_id, bill_item)
+#         choices.append(bill_tuple) 
+#     form.cash_flows[0].choices = choices
     

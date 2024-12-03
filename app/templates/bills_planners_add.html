@@ -3,55 +3,65 @@
 {% block content %}
 <div class="bills-planner-page">
     <div class="container">
-        <div class="column" style="border: 1px solid black;">
-            <div class="col-md-6">
-                <div class="row">
-                    <h5>Planner Totals</h5>
-                    <label>Total Bills Amount</label>
-                    <input type="text" class="form-control totals-amount-field" id='totals-amount-field' readonly value="Add Bills to Calculate"/>
-                </div>
-                <div class="row">
-                    <label>Total Cash Flows Amount</label>
-                    <input type="text" class="form-control total-cash-flows-amount-field" id='total-cash-flows-amount-field' readonly value="Add Cash Flows to Calculate"/>
-                </div>
-                <div class="row">      
-                    <label>Cash Flow Remaining Less Bills Amount</label>
-                    <input type="text" class="form-control total-cash-flows-minus-bills" id='total-cash-flows-minus-bills' readonly value="Cash Flow - Bills Placeholder"/>                        
-                </div>
+        <form method="POST" action="{{ url_for('bills_blueprint.bills_planners_add') }}">
+            {{ form.hidden_tag() }}
+            <div class="col-md-3">
+                <h5>Name this Planner</h5>
+                {{ form.bills_planner_name(class="form-control") }}
+            </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <h5>Planner Totals</h5>
+                <label>Total Bills Amount</label>
+                <input type="text" class="form-control" id="totals-amount-field" readonly value="₱0.00"/>
+
+                <label>Total Cash Flows Amount</label>
+                <input type="text" class="form-control" id="total-cash-flows-amount-field" readonly value="₱0.00"/>
+
+                <label>Balance Left After Bills Payment</label>
+                <input type="text" class="form-control" id="cash-flows-minus-bills" readonly value="₱0.00" style="background-color: rgb(169, 233, 169);"/>
+                
+                <label>Bills Left to Pay</label>
+                <input type="text" class="form-control" id="bills-minus-cash-flows" readonly value="₱0.00" style="background-color: rgb(243, 108, 108);"/>
+
             </div>
         </div>
-        <div class="row">
-            <!-- Left Section (Form) -->
-            <div class="row" style="border: 1px solid black;">
+
+        
+            <!-- Container for dynamically added bills fields -->
+            <div id="bills-fields-container"></div>
+
+            <div class="row">
+                <!-- Left Section: Bill Selection Form -->
                 <div class="col-md-6">
-                    <h5>Add Bills to Planner</h5>
-                    <form class="form-group" method="POST" action="{{ url_for('bills_blueprint.bills_planners_add') }}">
-                        <div class="mb-3">
-                            <label>Bill</label>
-                            <select name="bills[]" class="form-control bills-dropdown">
-                                <option value="">Select a bill</option>
-                                {% for bill in bills_db %}
-                                    <option value="{{ bill['_id'] }}">
-                                        {{ bill['biller']['biller_name'] }} due on {{ bill['due_date'].strftime('%b %d') }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label>Amount (Auto Fillup)</label>
-                            <input type="text" class="form-control bills-amount-field" readonly />
-                        </div>
-                        <div class="mb-3">
-                            <label>Set your Budget</label>
-                            <input type="text" class="form-control bills-allocation" id="bills-allocation" />
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm" id="add-bill-btn">+</button>
-                    </form>
+                    <h5>Select Bills</h5>
+                    <input type="text" id="search-bills" class="form-control" placeholder="Search bills">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-bills"> Select All</th>
+                                <th>Bill</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bills-table-body">
+                            {% for bill in bills_db %}
+                            <tr>
+                                <td><input type="checkbox" class="bill-checkbox" data-id="{{ bill['bill_id'] }}" data-amount="{{ bill['amount'] }}"></td>
+                                <td>{{ bill['biller']['biller_name'] }}</td>
+                                <td>₱{{ bill['amount'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-success btn-sm" id="add-selected-bills">Add Selected Bills</button>
                 </div>
 
-                <!-- Right Section (Table) -->
+                <!-- Right Section: Selected Bills Table -->
                 <div class="col-md-6">
                     <h5>Selected Bills</h5>
+                    <button type="button" class="btn btn-danger mb-2" id="remove-all-bills">Remove All Bills</button>
                     <table class="table">
                         <thead>
                             <tr>
@@ -61,54 +71,56 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="selected-bills-table">
-                            <!-- Rows will be added dynamically -->
-                        </tbody>
+                        <tbody id="selected-bills-table"></tbody>
                     </table>
                 </div>
-            </div>
 
-            <div class="row" style="border: 1px solid black;">
-                <!-- Next Section Cash Flow -->
+                <!-- Container for dynamically added cash flow fields -->
+                <div id="cash-flows-fields-container"></div>
+
+                <!-- Cash Flow Selection Section -->
                 <div class="col-md-6">
-                    <h5>Add Cash Flows to Planner</h5>
-                        <div class="mb-3">
-                            <label>Cash Flow</label>
-                            <select name="cash-flow[]" class="form-control cash-flows-dropdown">
-                                <option value="">Select a Cash Flow</option>
-                                {% for cash_flow in cash_flows_db %}
-                                    <option value="{{ cash_flow['_id'] }}">
-                                        {{ cash_flow['cash_flow_name'] }} on {{ cash_flow['possible_next_month_date'].strftime('%b %d') }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label>Amount (Auto Fillup)</label>
-                            <input type="text" class="form-control cash-flows-amount-field" id="cash-flows-amount-field" readonly />
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm" id="add-cash-flow-btn">+</button>
-                </div>
-                
-                <!-- Right Section (Table) -->
-                <div class="col-md-6">
-                    <h5>Selected Cash Flows</h5>
+                    <h5>Select Cash Flows to Add to Planner</h5>
+                    <input type="text" id="search-cash-flows" class="form-control mb-2" placeholder="Search cash flows">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Cash Flows</th>
+                                <th><input type="checkbox" id="select-all-cash-flows"> Select All</th>
+                                <th>Cash Flow Name</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cash-flows-table-body">
+                            {% for cash_flow in cash_flows_db %}
+                            <tr>
+                                <td><input type="checkbox" class="cash-flow-checkbox" data-id="{{ cash_flow['cash_flow_id'] }}" data-amount="{{ cash_flow['amount'] }}"></td>
+                                <td>{{ cash_flow['cash_flow_name'] }}</td>
+                                <td>₱{{ cash_flow['amount'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-success btn-sm" id="add-selected-cash-flows">Add Selected Cash Flows</button>
+                </div>
+
+                <!-- Selected Cash Flows Table -->
+                <div class="col-md-6">
+                    <h5>Selected Cash Flows</h5>
+                    <button type="button" class="btn btn-danger btn-sm" id="remove-all-cash-flows">Remove All</button>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cash Flow Name</th>
                                 <th>Amount</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="selected-cash-flows-table">
-                            <!-- Rows will be added dynamically -->
-                        </tbody>
+                        <tbody id="selected-cash-flows-table"></tbody>
                     </table>
                 </div>
+                <button type="submit" id="save-planner" class="btn btn-primary" style="max-width: 150px; margin: 40px;">Save Planner</button>
             </div>
-
-        </div>
+        </form>
     </div>
 </div>
 {% endblock %}

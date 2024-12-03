@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h5>Bills Allocation Planners</h5>
+
+    <!-- Table for displaying bills_planners records -->
+    <table class="table table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>Planner Name</th>
+                <th>Date Created</th>
+                <th>Bills Added</th>
+                <th>Cash Flows Added</th>
+                <th>Total Bills Amount</th>
+                <th>Total Cash Flows Amount</th>
+                <th>Remaining Funds After Bills Payment</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in bills_planners_records %}
+            <tr>
+                <td>{{ record.bills_planner_name }}</td>
+                <td>{{ record.date_inserted.strftime("%b %d %Y") }}</td>
+                <td>{{ record.bills_count }}</td>
+                <td>{{ record.cash_flows_count }}</td>
+                <td>{{ record.total_bills_amount }}</td>
+                <td>{{ record.total_cash_flows_amount }}</td>
+                <td>{{ record.bills_minus_cash_flows }}</td>
+                <td>
+                    <!-- Edit Icon -->
+                    <a href="{{ url_for('bills_blueprint.bills_planners_view', record_id=record._id) }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                        View
+                    </a>
+                    <!-- Delete Icon -->
+                    <form action="{{ url_for('bills_blueprint.bills_planners_delete', record_id=record._id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No planner records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('bills_blueprint.bills_planners_add') }}" class="btn btn-primary">Add Planner</a>
+</div>
+{% endblock %}

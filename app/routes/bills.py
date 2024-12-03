@@ -4,7 +4,7 @@ from app.config import Config
 from datetime import datetime
 from bson.objectid import ObjectId
 from app.routes.login_required import login_required
-from app.forms.bills import BillForm, CashFlowForm, BillerForm, BillsPlannerForm, populate_biller, populate_bills, populate_cash_flows
+from app.forms.bills import BillForm, CashFlowForm, BillerForm, BillsPlannerForm, populate_biller
 import pandas as pd
 import json
 from app.scripts.log import event_logging
@@ -364,7 +364,27 @@ def bills_planners_records():
         "user_id": user_id
     }
     ))
+    for i in bills_planners_records:
+        i['bills_count'] = len(i['bills'])
+        i['cash_flows_count'] = len(i['cash_flows'])
     return render_template('bills_planners.html', bills_planners_records=bills_planners_records)
+
+@bills_blueprint.route('/bills_planners_view/<string:record_id>', methods=['GET', 'POST'])
+@login_required
+def bills_planners_view(record_id):
+    try:
+        account_id = session.get('account_id')
+        user_id = session.get('user_id')
+
+        db = current_app.db
+
+        print(record_id)
+        print(type(record_id))
+        bills_planner_object = db.bills_planners.find_one({"_id": ObjectId(record_id)})
+    except Exception as e:
+        print(e)
+
+    return render_template('bills_planners_view.html', bills_planner_object=bills_planner_object)
 
 
 #------------
@@ -376,61 +396,91 @@ def bills_planners_add():
 
     db = current_app.db
 
-    bills_db = list(db.bills.find(
+    initial_bills_db = list(db.bills.find(
         {
             "account_id": account_id,
             "user_id": user_id
         }
-    )) 
-
-    cash_flows_db = list(db.cash_flows.find(
+    ))
+    bills_db = []
+    for i in initial_bills_db:
+        i['bill_id'] = str(i['_id'])
+        bills_db.append(i)
+    
+    initial_cash_flows_db = list(db.cash_flows.find(
         {
             "account_id": account_id,
             "user_id": user_id
         }
-    )) 
+    ))
+    cash_flows_db = []
+    for i in initial_cash_flows_db:
+        i['cash_flow_id'] = str(i['_id'])
+        cash_flows_db.append(i)
 
     form = BillsPlannerForm()
-    print(form)
-    print("append choices to bills")
-    populate_bills(form, bills_db)
+    # form.bills_planner_name.data = "manual name"
+    
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print(form)
 
-    populate_cash_flows(form, cash_flows_db)
+            planner_count = len(list(db['planners'].find({"account_id": account_id, "user_id": user_id})))
 
+            bills_objects = form.bills.data
+            cash_flows_objects = form.cash_flows.data
+
+            total_bills_amount = []
+            for i in bills_objects:
+                total_bills_amount.append(i['amount'])
+
+            total_cash_flows_amount = []
+            for i in cash_flows_objects:
+                total_cash_flows_amount.append(i['amount'])
+
+            bills_amount_final = sum(total_bills_amount)
+            cash_flows_amount_final = sum(total_cash_flows_amount)
+            new_data = {
+                'date_inserted': datetime.now(),
+                'bills_planner_name': form.bills_planner_name.data,
+                'planner_count_of_the_user': planner_count,
+                'account_id': account_id,
+                'user_id': user_id,
+                'bills': bills_objects,
+                'cash_flows': cash_flows_objects,
+                'total_bills_amount': bills_amount_final,
+                'total_cash_flows_amount': cash_flows_amount_final,
+                'bills_minus_cash_flows': bills_amount_final - cash_flows_amount_final,
+                'cash_flows_minus_bills': cash_flows_amount_final - bills_amount_final
+            }
+            print(new_data)
+            result = db.bills_planners.insert_one(new_data)
+
+            # Redirect after successful submission
+            flash("Planner saved successfully!", "success")
+            event_logging(event_var="bills allocations planner add",
+                            user_id=session.get('user_id'),
+                            account_id=session.get('account_id'),
+                            object_id=result.inserted_id,
+                            old_doc=None,
+                            new_doc=None,
+                            error=None)
+            return redirect(url_for('bills_blueprint.bills_planners_add'))
+        else:
+            print(form.errors)
+            event_logging(event_var="bills allocations planner error",
+                        user_id=session.get('user_id'),
+                        account_id=session.get('account_id'),
+                        object_id=None,
+                        old_doc=None,
+                        new_doc=None,
+                        error=form.errors)
+            flash(f"Error adding bills planner: {form.errors}", "danger")
+            flash(f"This error has been logged, you may add a ticket in Feedbacks.", "danger")
+            return render_template('bills_planners_add.html', bills_db=bills_db, cash_flows_db=cash_flows_db, form=form)
     return render_template('bills_planners_add.html', bills_db=bills_db, cash_flows_db=cash_flows_db, form=form)
 
-@bills_blueprint.route('/get_bills_amount', methods=['GET'])
-@login_required
-def get_bills_amount():
-    bill_name = request.args.get('bills')
-    if not bill_name:
-        return jsonify({"error": "Bill name is required"}), 400
-    
-    db = current_app.db
-    biller = db['bills'].find_one({"_id": ObjectId(bill_name)}, {"_id": 0, "amount": 1})
-    
-    if not biller:
-        return jsonify({"error": "Biller not found"}), 404
-    
-    return jsonify({"amount": biller.get('amount')})
-
-@bills_blueprint.route('/get_cash_flows_amount', methods=['GET'])
-@login_required
-def get_cash_flows_amount():
-    cash_flows_name = request.args.get('cash_flows')
-    if not cash_flows_name:
-        return jsonify({"error": "Cash Flow name is required"}), 400
-    
-    db = current_app.db
-    biller = db['cash_flows'].find_one({"_id": ObjectId(cash_flows_name)}, {"_id": 0, "amount": 1})
-    
-    if not biller:
-        return jsonify({"error": "Cash Flow not found"}), 404
-    
-    return jsonify({"amount": biller.get('amount')})
-
-#------------
-
+                
 
 # Route to delete a bills_planners record
 @bills_blueprint.route('/bills_planners_delete/<string:record_id>', methods=['POST'])
@@ -438,9 +488,25 @@ def get_cash_flows_amount():
 def bills_planners_delete(record_id):
     db = current_app.db
     try:
-        db.bills_planners.delete_one({"_id": ObjectId(record_id)})
-        flash("Orders record deleted successfully!", "success")
+        object = db.bills_planners.find_one({"_id": ObjectId(record_id)})
+        result = db.bills_planners.delete_one({"_id": ObjectId(record_id)})
+        flash("Planner record deleted successfully!", "success")
+        event_logging(event_var="bills allocations planner delete",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=record_id,
+                    old_doc=object,
+                    new_doc=None,
+                    error=None)
+
     except Exception as e:
+        event_logging(event_var="bills allocations planner delete error",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=None,
+                    old_doc=None,
+                    new_doc=None,
+                    error=e)
         flash(f"Error deleting record: {e}", "danger")
     return redirect(url_for('bills_blueprint.bills_planners_records'))
 
