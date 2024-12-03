@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
             // Add new row with cash flow info
             const row = document.createElement('tr');
+            row.setAttribute('data-index', index);  // Add a data-index attribute to each row
             row.innerHTML = `
                 <td>${cashFlowName}</td>
                 <td>₱${amount.toFixed(2)}</td>
@@ -82,10 +83,11 @@ document.addEventListener('DOMContentLoaded', function () {
             row.querySelector('.remove-btn').addEventListener('click', function () {
                 row.remove();
         
-                // Remove corresponding hidden inputs in the form container
-                formContainer.querySelector(`[name="cash_flows-${index}-cash_flow_name"]`).remove();
-                formContainer.querySelector(`[name="cash_flows-${index}-amount"]`).remove();
-                formContainer.querySelector(`[name="cash_flows-${index}-cash_flow_id]"`).remove();
+                // Use data-index to correctly identify and remove hidden inputs in the form container
+                const rowIndex = row.getAttribute('data-index');
+                formContainer.querySelector(`[name="cash_flows-${rowIndex}-cash_flow_name"]`).remove();
+                formContainer.querySelector(`[name="cash_flows-${rowIndex}-amount"]`).remove();
+                formContainer.querySelector(`[name="cash_flows-${rowIndex}-cash_flow_id"]`).remove();
         
                 updateTotal();
             });
@@ -113,9 +115,6 @@ document.addEventListener('DOMContentLoaded', function () {
         selectAllCashFlowsButton.checked = false;
         updateTotal(); // Update totals
     });
-    
-    
-    
 
     // Update the total calculation
     function updateTotal() {

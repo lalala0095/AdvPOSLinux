@@ -1,49 +1,64 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="container-dashboard">
-        <div class="row">
-            <div class="container-cards">
-                <div class="card" style="width: 10rem; height: 10rem;">
+        <div class="row justify-content-center">
+            <!-- First Row of Cards -->
+            <div class="col-md-2 mb-4">
+                <div class="card h-100">
                     <a href=" {{ url_for('orders_blueprint.orders') }} " class="card-link">
-                        <h3>Total Sales</h3>
-                        <p>{{ total_orders|currency }}</p>    
+                        <h3 class="card-header text-center">Total Sales</h3>
+                        <p class="card-body text-center">{{ total_orders|currency }}</p>    
                     </a>
                 </div>
-                <div class="card" style="width: 10rem; height: 10rem;">
+            </div>
+            <div class="col-md-2 mb-4">
+                <div class="card h-100">
                     <a href=" {{ url_for('orders_blueprint.orders') }} " class="card-link">
-                        <h3>Total Sales Count</h3>
-                        <p>{{ total_orders_quantity }}</p>    
+                        <h3 class="card-header text-center">Total Sales Count</h3>
+                        <p class="card-body text-center">{{ total_orders_quantity }}</p>    
                     </a>
                 </div>
-                <div class="card" style="width: 10rem; height: 10rem;">
+            </div>
+            <div class="col-md-2 mb-4">
+                <div class="card h-100">
                     <a href=" {{ url_for('products_blueprint.products') }} " class="card-link">
-                        <h3>Total Products</h3>
-                        <p>{{ total_products }}</p>
+                        <h3 class="card-header text-center">Total Products</h3>
+                        <p class="card-body text-center">{{ total_products }}</p>
                     </a>
                 </div>
-                <div class="card" style="width: 10rem; height: 10rem;">
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <!-- Second Row of Cards -->
+            <div class="col-md-2 mb-4">
+                <div class="card h-100">
                     <a href=" {{ url_for('cogs_blueprint.cogs_records') }} " class="card-link">
-                        <h3>Total Cost of Goods</h3>
-                        <p>{{ total_cogs|currency }}</p>
-                    </a>
-                </div>
-                <div class="card" style="width: 10rem; height: 10rem;">
-                    <a href=" {{ url_for('orders_blueprint.orders') }} " class="card-link">
-                        <h3>Total Revenue</h3>
-                        <p>{{ revenue|currency }}</p>
-                    </a>
-                </div>
-                <div class="card" style="width: 10rem; height: 10rem;">
-                    <a href=" {{ url_for('orders_blueprint.orders') }} " class="card-link">
-                        <h3>ROI</h3>
-                        <p>%{{ roi|round(2) }}</p>
+                        <h3 class="card-header text-center">Total Cost of Goods</h3>
+                        <p class="card-body text-center">{{ total_cogs|currency }}</p>
                     </a>
                 </div>
             </div>
-            <div class="container-charts">
-                <h5>Placeholder for charts</h5>
+            <div class="col-md-2 mb-4">
+                <div class="card h-100">
+                    <a href=" {{ url_for('orders_blueprint.orders') }} " class="card-link">
+                        <h3 class="card-header text-center">Total Revenue</h3>
+                        <p class="card-body text-center">{{ revenue|currency }}</p>
+                    </a>
+                </div>
             </div>
+            <div class="col-md-2 mb-4">
+                <div class="card h-100">
+                    <a href=" {{ url_for('orders_blueprint.orders') }} " class="card-link">
+                        <h3 class="card-header text-center">ROI</h3>
+                        <p class="card-body text-center">%{{ roi|round(2) }}</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-charts mt-5 text-center">
+            <h5>Placeholder for charts</h5>
         </div>
     </div>
 {% endblock %}
-
