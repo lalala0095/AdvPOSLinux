@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for, flash, session, request
+from flask import Response, Blueprint, render_template, current_app, redirect, url_for, flash, session, request
 import pandas as pd
 from app.forms.forms import AccountForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash

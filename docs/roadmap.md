@@ -20,7 +20,7 @@ Focus: CRUD operations and core functionalities for accounts, staff, inventory, 
 ### 1.2. Authentication and Authorization (Week 3-4)
  - [x] Create login/logout functionality for accounts and users.
  - [ ] Implement role-based access control (Admin, Staff).
- - [ ] Secure routes with authentication.
+ - [x] Secure routes with authentication (added recaptcha in signup).
  - [x] Build a basic frontend for user authentication (e.g., login form).
 ### 1.3. CRUD for Accounts and Staff Management (Week 5-6)
  - [ ] Create backend APIs for user and staff management.
