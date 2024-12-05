@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.login_required import login_required
 from app.scripts.log import event_logging
 from datetime import datetime
+import requests
 
 main = Blueprint('main', __name__)
 
@@ -127,44 +128,141 @@ def logout():
                 error=None)
     return redirect(url_for('main.login'))  # Redirect to login page
 
+# @main.route('/admin_signup', methods=['GET', 'POST'])
+# def admin_signup():
+#     recaptcha_site_key = current_app.config['RECAPTCHA_SITE_KEY']
+#     recaptcha_secret_key = current_app.config['RECAPTCHA_SECRET_KEY']
+
+#     form = AccountForm()
+#     # Get the reCAPTCHA response from the form
+#     recaptcha_response = request.form.get('g-recaptcha-response')
+    
+#     # Verify the reCAPTCHA response with Google's API
+#     verification_url = 'https://www.google.com/recaptcha/api/siteverify'
+#     response = requests.post(verification_url, data={
+#         'secret': recaptcha_secret_key,
+#         'response': recaptcha_response
+#     })
+#     verification_result = response.json()
+    
+#     # Check if verification was successful
+#     if not verification_result.get('success'):
+#         error_codes = verification_result.get('error-codes', [])
+#         flash(f'reCAPTCHA failed: {", ".join(error_codes)}', 'danger')
+#         event_logging(event_var="admin signup failed recaptcha",
+#             user_id=None,
+#             account_id=None,
+#             object_id=None,
+#             old_doc=None,
+#             new_doc=None,
+#             error=error_codes)
+#         return redirect(url_for('main.admin_signup'))
+
+#     db = current_app.db
+
+#     if form.validate_on_submit():
+#         if db.accounts.find_one({'username': form.username.data.strip().lower()}):
+#             flash("Username already exists. Please choose a different one.", "danger")
+#             return redirect(url_for('main.admin_signup'))
+        
+#         hashed_password = generate_password_hash(form.password.data)
+#         count_docs = db.accounts.count_documents({})
+        
+#         new_record = {
+#             'date_inserted': datetime.now(),
+#             'account_id': count_docs,
+#             'username': form.username.data.strip(),
+#             'password': hashed_password,
+#             'name': form.name.data.strip().title(),
+#             'email': form.email.data.strip().lower(),
+#             'subscription': form.subscription.data,
+#             'is_admin': True
+#         }
+
+#         result = db.accounts.insert_one(new_record)
+#         result_id = result.inserted_id
+#         new_record['_id'] = result_id
+            
+#         event_logging(event_var="admin signup",
+#                     user_id=session.get('user_id'),
+#                     account_id=session.get('account_id'),
+#                     object_id=result_id,
+#                     old_doc=None,
+#                     new_doc=new_record,
+#                     error=None)
+
+#         flash("Admin account created successfully!", "success")
+#         return redirect(url_for('main.login'))
+
+#     return render_template('admin_signup.html', form=form, site_key=recaptcha_site_key)
+
 @main.route('/admin_signup', methods=['GET', 'POST'])
 def admin_signup():
+    recaptcha_site_key = current_app.config['RECAPTCHA_SITE_KEY']
+    recaptcha_secret_key = current_app.config['RECAPTCHA_SECRET_KEY']
+
     form = AccountForm()
-    db = current_app.db
 
-    if form.validate_on_submit():
-        if db.accounts.find_one({'username': form.username.data}):
-            flash("Username already exists. Please choose a different one.", "danger")
+    if request.method == 'POST':
+        # Get the reCAPTCHA response from the form
+        recaptcha_response = request.form.get('g-recaptcha-response')
+        
+        # Verify the reCAPTCHA response with Google's API
+        verification_url = 'https://www.google.com/recaptcha/api/siteverify'
+        response = requests.post(verification_url, data={
+            'secret': recaptcha_secret_key,
+            'response': recaptcha_response
+        })
+        verification_result = response.json()
+        
+        # Check if verification was successful
+        if not verification_result.get('success'):
+            error_codes = verification_result.get('error-codes', [])
+            flash(f'reCAPTCHA failed: {", ".join(error_codes)}', 'danger')
+            event_logging(event_var="admin signup failed recaptcha",
+                          user_id=None,
+                          account_id=None,
+                          object_id=None,
+                          old_doc=None,
+                          new_doc=None,
+                          error=error_codes)
             return redirect(url_for('main.admin_signup'))
-        
-        hashed_password = generate_password_hash(form.password.data)
-        count_docs = db.accounts.count_documents({})
-        
-        new_record = {
-            'date_inserted': datetime.now(),
-            'account_id': count_docs,
-            'username': form.username.data.strip(),
-            'password': hashed_password,
-            'name': form.name.data.strip().title(),
-            'email': form.email.data.strip().lower(),
-            'subscription': form.subscription.data,
-            'is_admin': True
-        }
 
-        result = db.accounts.insert_one(new_record)
-        result_id = result.inserted_id
-        new_record['_id'] = result_id
+        db = current_app.db
+
+        if form.validate_on_submit():
+            if db.accounts.find_one({'username': form.username.data.strip().lower()}):
+                flash("Username already exists. Please choose a different one.", "danger")
+                return redirect(url_for('main.admin_signup'))
             
-        event_logging(event_var="admin signup",
-                    user_id=session.get('user_id'),
-                    account_id=session.get('account_id'),
-                    object_id=result_id,
-                    old_doc=None,
-                    new_doc=new_record,
-                    error=None)
+            hashed_password = generate_password_hash(form.password.data)
+            count_docs = db.accounts.count_documents({})
 
-        flash("Admin account created successfully!", "success")
-        return redirect(url_for('main.login'))
+            new_record = {
+                'date_inserted': datetime.now(),
+                'account_id': count_docs,
+                'username': form.username.data.strip(),
+                'password': hashed_password,
+                'name': form.name.data.strip().title(),
+                'email': form.email.data.strip().lower(),
+                'subscription': form.subscription.data,
+                'is_admin': True
+            }
 
-    return render_template('admin_signup.html', form=form)
+            result = db.accounts.insert_one(new_record)
+            result_id = result.inserted_id
+            new_record['_id'] = result_id
 
+            event_logging(event_var="admin signup",
+                          user_id=session.get('user_id'),
+                          account_id=session.get('account_id'),
+                          object_id=result_id,
+                          old_doc=None,
+                          new_doc=new_record,
+                          error=None)
+
+            flash("Admin account created successfully!", "success")
+            return redirect(url_for('main.login'))
+
+    # Render the signup page for GET requests
+    return render_template('admin_signup.html', form=form, site_key=recaptcha_site_key)

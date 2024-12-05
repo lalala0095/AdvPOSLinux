@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')  # Use 'default-secret-key' as fallback
-    MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/mydb')  # Fallback to local Mongo URI
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
+    MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/mydb')
     mongo = MongoClient(MONGO_URI)
     db = mongo['advpos']
+    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', 'default-recaptcha-secret-key')
+    RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', 'default-recaptcha-site-key')
 
 class DevelopmentConfig(Config):
     DEBUG = True
