@@ -29,6 +29,9 @@ def sitemap():
     sitemap_content = generate_sitemap(app, domain="https://advposapp.com")
     return Response(sitemap_content, mimetype='application/xml')
 
+@app.route('/sitemap_static.xml')
+def sitemap_static():
+    return app.send_static_file('sitemap_static.xml')
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
