@@ -65,7 +65,7 @@ def cogs_add():
             if field == 'price':
                 field_value = float(request.form.get(field))
             else:
-                field_value = float(request.form.get(field))
+                field_value = request.form.get(field)
             new_record[field] = field_value
 
         primary_fields = {

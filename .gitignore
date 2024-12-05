@@ -12,6 +12,7 @@ advpos.zip
 app/*copy*
 app/static/css/style-*
 app/static/js/*scripts *
+my_ec2_server_scripts.md
 
 # Ignore .env file containing sensitive data
 .env
