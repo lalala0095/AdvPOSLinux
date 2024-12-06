@@ -3,78 +3,76 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-            <!-- Users Records Container -->
-        <div class="col-md-6 users-records">
-            <h5>Users Records</h5>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Account ID</th>
-                        <th>User ID</th>
-                        <th>Username</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Admin Privileges</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in users_records %}
-                    <tr>
-                        <td>{{ record.account_id }}</td>
-                        <td>{{ record.user_id }}</td>
-                        <td>{{ record.username }}</td>
-                        <td>{{ record.name }}</td>
-                        <td>{{ record.email }}</td>
-                        <td>{{ "Yes" if record.is_admin else "No"}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <!-- Add User Form Container -->
-        <div class="col-md-6 add-new-user">
-            <h5 class="mt-5">Add New User</h5>
-            <form method="POST" action="{{ url_for('users_blueprint.users_add') }}">
-                {{ form.hidden_tag() }}
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required >
-                </div>
-                <div class="mb-3">
-                    <label for="confirm_password" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                </div>
-                {% if form.confirm_password.errors %}
-                    <div class="text-danger">
-                        {% for error in form.confirm_password.errors %}
-                            <p>{{ error }}</p>
+        <h5>Expenses Records</h5>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    {% if expenses_records %}
+                        {% for key in expenses_records[0].keys() %}
+                            <!-- {{ key }} -->
+                            {% if  key != "_id" and key != "date_inserted" and key != "account_id" and key != "user_id" %}
+                                <th scope="col">{{ key.replace('_', ' ') | capitalize }}</th>
+                            {% endif %}
                         {% endfor %}
-                    </div>
-                {% endif %}    
-                <div class="mb-3">
-                    <label for="name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="name" name="name">
+                    {% else %}
+                        <th>No Data Available</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if expenses_records %}
+                    {% for expenses in expenses_records %}
+                            <tr>
+                                {% for key, value in expenses.items() %}
+                                    {% if key != "_id" and key != "date_inserted" and key != "account_id" and key != "user_id"%}
+                                        {% if value == None %}
+                                            {% if key == "date_updated" %}
+                                                <td>{{ value.strftime("%Y-m%-%d") }}</td>
+                                            {% endif %}
+                                        {% else %}
+                                            <td>{{ value }}</td>
+                                        {% endif %}
+                                    {% endif %}                                     
+                                {% endfor %}
+                            </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">No records found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="column">
+    <!-- Add Expenses Form Container -->
+    <div class="col-md-4 add-new-record">
+        <h5 class="mt-5">Add New Expenses</h5>
+        <form method="POST" action="{{ url_for('expenses_blueprint.expenses_add') }}">
+            {{ form.hidden_tag() }}
+            {% for field in form %}
+                {% if field.name != "submit" and field.name != 'csrf_token' %}
+                <div class="mb-3">    
+                    <label for="{{ field.id }}" class="form-label">{{ field.label }}</label>
+                    {{ field(class="form-control")}}
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" step="0.01" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="is_admin" class="form-label">Admin Privileges</label>
-                    <select class="form-control" id="is_admin" name="is_admin" required>
-                        <option value="True" is-admin-id="1">True</option>
-                        <option value="False" is-admin-id="2">False</option>
-                    </select>
-                </div>                
-                <button type="submit" class="btn btn-primary">Save User</button>
-                <a href="{{ url_for('users_blueprint.users') }}" class="btn btn-secondary">Cancel</a>
-            </form>
-        </div>
+                    
+                    {% if field.errors %}
+                        <div class="text-danger">
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+           <!-- <div class="form-group"> -->
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('expenses_blueprint.expenses_records') }}" class="btn btn-secondary">Cancel</a>
+            <!-- </div> -->
+        </form>
     </div>
 </div>
-
+    </div>
+</div>
 {% endblock %}

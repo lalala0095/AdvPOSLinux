@@ -2,43 +2,43 @@ from flask import render_template, request, redirect, url_for, flash, Blueprint,
 from datetime import datetime
 from bson.objectid import ObjectId
 from app.routes.login_required import login_required
-from app.forms.cogs import COGsForm, COGsUpdateForm
+from app.forms.expenses import ExpensesForm, ExpensesUpdateForm
 import pandas as pd
 from app.scripts.log import event_logging
 from werkzeug.datastructures import MultiDict
 
-cogs_blueprint = Blueprint('cogs_blueprint', __name__)
+expenses_blueprint = Blueprint('expenses_blueprint', __name__)
 
-@cogs_blueprint.route('/cogs_records', methods=['GET', 'POST'])
+@expenses_blueprint.route('/expenses_records', methods=['GET', 'POST'])
 @login_required
-def cogs_records():
+def expenses_records():
     account_id = session.get('account_id')
     user_id = session.get('user_id')
 
     db = current_app.db
-    # Fetch all cogs records from the database
-    cogs_records = list(db.cogs.find({
+    # Fetch all expense records from the database
+    expenses_records = list(db.expense.find({
         'user_id': user_id,
         'account_id': account_id
     }))
-    for cog in cogs_records:
+    for cog in expenses_records:
         cog['date_updated'] = cog['date_updated'].strftime("%Y-%m-%d")
-    return render_template('cogs.html', cogs_records=cogs_records)
+    return render_template('expenses.html', expenses_records=expenses_records)
 
-@cogs_blueprint.route('/cogs_add', methods=['GET', 'POST'])
+@expenses_blueprint.route('/expenses_add', methods=['GET', 'POST'])
 @login_required
-def cogs_add():
+def expenses_add():
     account_id = session.get('account_id')
     user_id = session.get('user_id')
 
     db = current_app.db
-    cogs_records = list(db.cogs.find({
+    expenses_records = list(db.expense.find({
         'user_id': user_id,
         'account_id': account_id
     }))
-    for cog in cogs_records:
+    for cog in expenses_records:
         cog['date_updated'] = pd.to_datetime(cog['date_updated']).strftime("%Y-%m-%d")
-    form = COGsForm()
+    form = ExpensesForm()
 
     if session.get('user_id'):
         user_id = session['user_id']
@@ -54,8 +54,7 @@ def cogs_add():
             'date_of_transaction',
             'description',
             'price',
-            'type_of_goods',
-            'platform',
+            'type_of_expense',
             'store',
             'remarks',
             'payment_method'
@@ -79,19 +78,19 @@ def cogs_add():
         new_record.update(primary_fields)
 
         try:
-            result = db.cogs.insert_one(new_record)
+            result = db.expense.insert_one(new_record)
             result_id = result.inserted_id
             new_record['_id'] = result_id
-            event_logging(event_var="cogs add",
+            event_logging(event_var="expense add",
                         user_id=session.get('user_id'),
                         account_id=session.get('account_id'),
                         object_id=result_id,
                         old_doc=None,
-                        new_doc=new_record,
+                        new_doc=None,
                         error=None)
             flash("Cost of Goods record added successfully!", "success")
         except Exception as e:
-            event_logging(event_var="cogs add",
+            event_logging(event_var="expense add error",
                         user_id=session.get('user_id'),
                         account_id=session.get('account_id'),
                         object_id=None,
@@ -100,39 +99,51 @@ def cogs_add():
                         error=e)
             flash(f"Error deleting record: {e}", "danger")
 
-        return redirect(url_for('cogs_blueprint.cogs_add'))  # Stay on the same page to show updated records
+        return redirect(url_for('expenses_blueprint.expenses_add'))  # Stay on the same page to show updated records
 
-    return render_template('cogs_add.html', form=form, cogs_records=cogs_records)
+    return render_template('expenses_add.html', form=form, expenses_records=expenses_records)
 
 
-# Route to delete a cogs record
-@cogs_blueprint.route('/cogs_delete/<string:record_id>', methods=['POST'])
+# Route to delete a expense record
+@expenses_blueprint.route('/expenses_delete/<string:record_id>', methods=['POST'])
 @login_required
-def cogs_delete(record_id):
+def expenses_delete(record_id):
     account_id = session.get('account_id')
     user_id = session.get('user_id')
 
     db = current_app.db
-    record = db.cogs.find_one({"_id": ObjectId(record_id)})
+    record = db.expense.find_one({"_id": ObjectId(record_id)})
     try:
-        db.cogs.delete_one({"_id": ObjectId(record_id)})
-        event_logging("cogs delete", session.get('user_id'), session.get('account_id'), record_id, record, None, None)
-        flash("cogs record deleted successfully!", "success")
+        db.expense.delete_one({"_id": ObjectId(record_id)})
+        event_logging(event_var="expense delete",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=record_id,
+                    old_doc=record,
+                    new_doc=None,
+                    error=None)
+        flash("expense record deleted successfully!", "success")
     except Exception as e:
-        event_logging("cogs delete", session.get('user_id'), session.get('account_id'), record_id, record, record, e)
+        event_logging(event_var="expense delete",
+                    user_id=session.get('user_id'),
+                    account_id=session.get('account_id'),
+                    object_id=record_id,
+                    old_doc=record,
+                    new_doc=None,
+                    error=e)
         flash(f"Error deleting record: {e}", "danger")
-    return redirect(url_for('cogs_blueprint.cogs_records'))
+    return redirect(url_for('expenses_blueprint.expenses_records'))
 
 
-@cogs_blueprint.route('/cogs_edit/<string:record_id>', methods=['GET', 'POST'])
+@expenses_blueprint.route('/expenses_edit/<string:record_id>', methods=['GET', 'POST'])
 @login_required
-def cogs_edit(record_id):
+def expenses_edit(record_id):
     account_id = session.get('account_id')
     user_id = session.get('user_id')
 
     db = current_app.db
-    record = db.cogs.find_one({"_id": ObjectId(record_id)})
-    cogs_records = list(db.cogs.find({
+    record = db.expense.find_one({"_id": ObjectId(record_id)})
+    expenses_records = list(db.expense.find({
         'user_id': user_id,
         'account_id': account_id
     }))
@@ -141,7 +152,7 @@ def cogs_edit(record_id):
             'date_of_transaction',
             'description',
             'price',
-            'type_of_goods',
+            'type_of_expense',
             'platform',
             'store',
             'remarks',
@@ -150,7 +161,7 @@ def cogs_edit(record_id):
 
     if not record:
         flash("Cost of goods record not found!", "danger")
-        return redirect(url_for('cogs_blueprint.cogs_records'))
+        return redirect(url_for('expenses_blueprint.expenses_records'))
 
     date_inserted = datetime.now()
     primary_fields = {
@@ -170,7 +181,7 @@ def cogs_edit(record_id):
     print(primary_fields)
 
     formdata = MultiDict(primary_fields)
-    form = COGsUpdateForm(data=formdata)
+    form = ExpensesUpdateForm(data=formdata)
 
     if form.validate_on_submit():
         if session.get('user_id'):
@@ -188,7 +199,7 @@ def cogs_edit(record_id):
         price = float(form.price.data)
         platform = form.platform.data
         store = form.store.data
-        type_of_goods = form.type_of_goods.data
+        type_of_expense = form.type_of_expense.data
         remarks = form.remarks.data
 
         updated_record = {
@@ -198,7 +209,7 @@ def cogs_edit(record_id):
             'date_of_transaction': date_of_transaction.strftime("%Y-%m-%d"),
             'description': description,
             'price': price,
-            'type_of_goods': type_of_goods,
+            'type_of_expense': type_of_expense,
             'platform': platform,
             'store': store,
             'remarks': remarks,
@@ -206,18 +217,30 @@ def cogs_edit(record_id):
         }
 
         try:
-            db.cogs.update_one({"_id": ObjectId(record_id)}, {"$set": updated_record})
-            new_doc = db.cogs.find_one({"_id": ObjectId(record_id)})
-            event_logging("cogs edit", session.get('user_id'), session.get('account_id'), record_id, record, new_doc, None)
+            db.expense.update_one({"_id": ObjectId(record_id)}, {"$set": updated_record})
+            new_doc = db.expense.find_one({"_id": ObjectId(record_id)})
+            event_logging(event_var="expense edit",
+                        user_id=session.get('user_id'),
+                        account_id=session.get('account_id'),
+                        object_id=record_id,
+                        old_doc=record,
+                        new_doc=new_doc,
+                        error=None)
             flash("User record updated successfully!", "success")
         except Exception as e:
-            new_doc = db.cogs.find_one({"_id": ObjectId(record_id)})
-            event_logging("cogs edit", session.get('user_id'), session.get('account_id'), record_id, record, new_doc, e)
+            new_doc = db.expense.find_one({"_id": ObjectId(record_id)})
+            event_logging(event_var="expense edit error",
+                        user_id=session.get('user_id'),
+                        account_id=session.get('account_id'),
+                        object_id=record_id,
+                        old_doc=record,
+                        new_doc=new_doc,
+                        error=e)
             flash(f"Error updating record: {e}", "danger")
-        return redirect(url_for('cogs_blueprint.cogs_records'))
+        return redirect(url_for('expenses_blueprint.expenses_records'))
 
     # Display errors if validation fails
     if request.method == 'POST':
         flash("Please correct the errors in the form.", "danger")
 
-    return render_template('cogs_edit.html', form=form, record=record, cogs_records=cogs_records)
+    return render_template('expenses_edit.html', form=form, record=record, expenses_records=expenses_records)

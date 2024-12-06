@@ -3,49 +3,46 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <!-- Records Records Container -->
-        <div class="col-md-6">
-            <h5>Cost of Goods Records</h5>
-            <table class="table table-bordered">
-                <thead class="table-primary">
-                    <tr>
-                        {% if cogs_records %}
-                            {% for key in cogs_records[0].keys() %}
-                                <!-- {{ key }} -->
-                                {% if  key != "_id" and key != "date_inserted" %}
-                                    <th scope="col">{{ key.replace('_', ' ') | capitalize }}</th>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <th>No Data Available</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
+        <h5>Cost of Goods Records</h5>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
                     {% if cogs_records %}
-                        {% for cogs in cogs_records %}
-                                <tr>
-                                    {% for key, value in cogs.items() %}
-                                        {% if key != "_id" and key != "date_inserted" %}
-                                            {% if value == None %}
-                                                {% if key == "date_updated" %}
-                                                    <td>{{ value.strftime("%Y-m%-%d") }}</td>
-                                                {% endif %}
-                                            {% else %}
-                                                <td>{{ value }}</td>
-                                            {% endif %}
-                                        {% endif %}                                     
-                                    {% endfor %}
-                                </tr>
+                        {% for key in cogs_records[0].keys() %}
+                            <!-- {{ key }} -->
+                            {% if  key != "_id" and key != "date_inserted" and key != "account_id" and key != "user_id" %}
+                                <th scope="col">{{ key.replace('_', ' ') | capitalize }}</th>
+                            {% endif %}
                         {% endfor %}
                     {% else %}
-                        <tr>
-                            <td colspan="7">No records found.</td>
-                        </tr>
+                        <th>No Data Available</th>
                     {% endif %}
-                </tbody>
-            </table>
-        </div>
+                </tr>
+            </thead>
+            <tbody>
+                {% if cogs_records %}
+                    {% for cogs in cogs_records %}
+                            <tr>
+                                {% for key, value in cogs.items() %}
+                                    {% if key != "_id" and key != "date_inserted" and key != "account_id" and key != "user_id"%}
+                                        {% if value == None %}
+                                            {% if key == "date_updated" %}
+                                                <td>{{ value.strftime("%Y-m%-%d") }}</td>
+                                            {% endif %}
+                                        {% else %}
+                                            <td>{{ value }}</td>
+                                        {% endif %}
+                                    {% endif %}                                     
+                                {% endfor %}
+                            </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">No records found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
     <div class="column">
     <!-- Add Cost of Goods Form Container -->

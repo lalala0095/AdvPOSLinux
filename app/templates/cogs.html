@@ -2,66 +2,56 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
-        <!-- Records Records Container -->
-        <div class="col-md-6 records">
-            <h5>Cost of Goods Records</h5>
-            <table class="table table-bordered">
-                <thead class="table-primary">
-                    <tr>
-                        {% if cogs_records %}
-                            {% for key in cogs_records[0].keys() %}
-                                <!-- {{ key }} -->
-                                {% if  key != "_id" and key != "date_inserted" %}
-                                    <th>{{ key.replace('_', ' ') | capitalize }}</th>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <th>No Data Available</th>
-                        {% endif %}
-                        <th>Options</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if cogs_records %}
-                        {% for cogs in cogs_records %}
-                                <tr>
-                                    {% for key, value in cogs.items() %}
-                                        {% if key != "_id" and key != "date_inserted" %}
-                                            {% if value == None %}
-                                                {% if key == "date_updated" %}
-                                                    <td>{{ value.strftime("%Y-m%-%d") }}</td>
-                                                {% endif %}
-                                            {% else %}
-                                                <td>{{ value }}</td>
-                                            {% endif %}
-                                        {% endif %}                                     
-                                    {% endfor %}
-                                    <td>
-                                        <!-- Edit Icon -->
-                                        <a href="{{ url_for('cogs_blueprint.cogs_edit', record_id=cogs._id) }}" class="btn btn-warning btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                            Edit
-                                        </a>
-                                        <!-- Delete Icon -->
-                                        <form action="{{ url_for('cogs_blueprint.cogs_delete', record_id=cogs._id) }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-                                                <i class="fas fa-trash"></i>
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                                <td colspan="11">No records found.</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <!-- Records Records Container -->
+    <h5>Cost of Goods Records</h5>
+    <table class="table table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>Date of Transaction</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Type</th>
+                <th>Platform</th>
+                <th>Store</th>
+                <th>Payment Method</th>
+                <th>Remarks</th>
+                <th>Date Updated</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cogs in cogs_records %}
+            <tr>
+                <td>{{ cogs.date_of_transaction }}</td>
+                <td>{{ cogs.description }}</td>
+                <td>{{ cogs.price | currency }}</td>
+                <td>{{ cogs.type_of_goods }}</td>
+                <td>{{ cogs.platform }}</td>
+                <td>{{ cogs.store }}</td>
+                <td>{{ cogs.payment_method }}</td>
+                <td>{{ cogs.remarks }}</td>
+                <td>{{ cogs.date_updated }}</td>
+                <td>
+                    <!-- Edit Icon -->
+                    <a href="{{ url_for('cogs_blueprint.cogs_edit', record_id=cogs._id) }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </a>
+                    <!-- Delete Icon -->
+                    <form action="{{ url_for('cogs_blueprint.cogs_delete', record_id=cogs._id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                    <td colspan="11">No records found.</td>
+            </tr>
+        </tbody>
+    </table>
     <a href="{{ url_for('cogs_blueprint.cogs_add') }}" class="btn btn-primary">Add Cost of Goods</a>
 </div>
 {% endblock %}

@@ -33,9 +33,9 @@ def sitemap():
 def sitemap_static():
     return app.send_static_file('sitemap_static.xml')
 
-if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+# if __name__ == "__main__":
+#     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
 
 # # local testing
-# if __name__ == "__main__":
-#     app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)

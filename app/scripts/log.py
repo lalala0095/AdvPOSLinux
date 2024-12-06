@@ -6,7 +6,7 @@ from flask_pymongo import MongoClient
 
 MONGO_URI = os.environ.get('MONGO_URI')
 client = MongoClient(MONGO_URI)
-db = client.adv_sop
+db = client.advpos
 
 def event_logging(event_var, user_id, account_id, object_id, old_doc, new_doc, error):
     log_entry = {

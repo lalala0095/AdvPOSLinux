@@ -61,7 +61,7 @@ def index():
     })
 
     total_cogs = 0
-    cursor = db.orders.aggregate([
+    cursor = db.cogs.aggregate([
         {"$match": {'user_id': user_id, 'account_id': account_id}},
         {'$group': {'_id': None, 'total': {'$sum': '$price'}}}
     ])

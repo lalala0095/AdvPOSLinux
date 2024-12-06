@@ -1,0 +1,45 @@
+        /* Dark mode styling */
+        body {
+            background-color: #1e1e2f;
+            color: #fff;
+        }
+
+        .sidebar {
+            background-color: #28293e;
+            min-height: 100vh;
+            width: 250px;
+        }
+
+        .sidebar .nav-link {
+            color: #c5c6d0;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #414255;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .dropdown-menu {
+            background-color: #28293e;
+            border: none;
+        }
+
+        .dropdown-item {
+            color: #c5c6d0;
+        }
+
+        .dropdown-item:hover {
+            background-color: #414255;
+            color: #fff;
+        }
