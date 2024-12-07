@@ -4,58 +4,46 @@
 <div class="container mt-4">
     <!-- Records Records Container -->
     <h5>Expenses Records</h5>
-    <table class="table table-bordered">
-        <thead class="table-primary">
-            <tr>
-                {% if expenses_records %}
-                    {% for key in expenses_records[0].keys() %}
-                        <!-- {{ key }} -->
-                        {% if  key != "_id" and key != "account_id" and key != "user_id" and key != "date_inserted" %}
-                            <th>{{ key.replace('_', ' ') | capitalize }}</th>
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <th>No Data Available</th>
-                {% endif %}
-                <th>Options</th>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <th>Date Of Transaction</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Type</th>
+                <th>Platform</th>
+                <th>Store</th>
+                <th>Remarks</th>
+                <th>Payment Method</th>
+                <th>Option</th>
             </tr>
         </thead>
         <tbody>
-            {% if expenses_records %}
-                {% for expenses in expenses_records %}
-                        <tr>
-                            {% for key, value in expenses.items() %}
-                                {% if key != "_id" and key != "account_id" and key != "user_id" and key != "date_inserted" %}
-                                    {% if value == None %}
-                                        {% if key == "date_updated" %}
-                                            <td>{{ value.strftime("%Y-m%-%d") }}</td>
-                                        {% endif %}
-                                    {% else %}
-                                        <td>{{ value }}</td>
-                                    {% endif %}
-                                {% endif %}                                     
-                            {% endfor %}
-                            <td>
-                                <!-- Edit Icon -->
-                                <a href="{{ url_for('expenses_blueprint.expenses_edit', record_id=expenses._id) }}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                    Edit
-                                </a>
-                                <!-- Delete Icon -->
-                                <form action="{{ url_for('expenses_blueprint.expenses_delete', record_id=expenses._id) }}" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-                                        <i class="fas fa-trash"></i>
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                        <td colspan="11">No records found.</td>
-                </tr>
-            {% endif %}
+            {% for record in expenses_records %}
+            <tr>
+                <td>{{ record.date_of_transaction }}</td>
+                <td>{{ record.description }}</td>
+                <td>{{ record.price | currency }}</td>
+                <td>{{ record.type_of_expense }}</td>
+                <td>{{ record.platform }}</td>
+                <td>{{ record.store }}</td>
+                <td>{{ record.remarks }}</td>
+                <td>{{ record.payment_method }}</td>
+                <td>
+                    <!-- Edit Icon -->
+                    <a href="{{ url_for('expenses_blueprint.expenses_edit', record_id=record._id) }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </a>
+                    <!-- Delete Icon -->
+                    <form action="{{ url_for('expenses_blueprint.expenses_delete', record_id=record._id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
     <a href="{{ url_for('expenses_blueprint.expenses_add') }}" class="btn btn-primary">Add Expenses</a>

@@ -6,41 +6,29 @@
         <h5>Expenses Records</h5>
         <table class="table table-bordered">
             <thead class="table-primary">
-                <tr>
-                    {% if expenses_records %}
-                        {% for key in expenses_records[0].keys() %}
-                            <!-- {{ key }} -->
-                            {% if  key != "_id" and key != "date_inserted" and key != "account_id" and key != "user_id" %}
-                                <th scope="col">{{ key.replace('_', ' ') | capitalize }}</th>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <th>No Data Available</th>
-                    {% endif %}
+                    <th>Date Of Transaction</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                    <th>Platform</th>
+                    <th>Store</th>
+                    <th>Remarks</th>
+                    <th>Payment Method</th>
                 </tr>
             </thead>
             <tbody>
-                {% if expenses_records %}
-                    {% for expenses in expenses_records %}
-                            <tr>
-                                {% for key, value in expenses.items() %}
-                                    {% if key != "_id" and key != "date_inserted" and key != "account_id" and key != "user_id"%}
-                                        {% if value == None %}
-                                            {% if key == "date_updated" %}
-                                                <td>{{ value.strftime("%Y-m%-%d") }}</td>
-                                            {% endif %}
-                                        {% else %}
-                                            <td>{{ value }}</td>
-                                        {% endif %}
-                                    {% endif %}                                     
-                                {% endfor %}
-                            </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="7">No records found.</td>
-                    </tr>
-                {% endif %}
+                {% for record in expenses_records %}
+                <tr>
+                    <td>{{ record.date_of_transaction }}</td>
+                    <td>{{ record.description }}</td>
+                    <td>{{ record.price | currency }}</td>
+                    <td>{{ record.type_of_expense }}</td>
+                    <td>{{ record.platform }}</td>
+                    <td>{{ record.store }}</td>
+                    <td>{{ record.remarks }}</td>
+                    <td>{{ record.payment_method }}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

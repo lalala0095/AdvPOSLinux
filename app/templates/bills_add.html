@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="container mt-4 bills-add">
-    <div class="row">
+    <!-- <div class="row"> -->
             <!-- Bills Records Container -->
-        <div class="col-md-6 bills-records">
+        <!-- <div class="col-md-6 bills-records"> -->
             <h5>Bills Records</h5>
             <table class="table table-bordered">
                 <thead class="table-primary">
@@ -28,9 +28,9 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-    <div class="column">
+        <!-- </div>
+    </div> -->
+    <!-- <div class="column"> -->
         <!-- Add Bill Form Container -->
         <div class="col-md-6 add-new-record">
             <h5 class="mt-5">Add New Bill</h5>
@@ -41,7 +41,10 @@
                     {{ form.bill_name(class="form-control", id="bill_name_dropdown") }}
     
                     {{ form.amount.label(class="form.label",  style="font-weight: normal;") }}
-                    {{ form.amount(class="form-control", id="amount_field", readonly="readonly" ) }}
+                    {{ form.amount(class="form-control", id="amount_field" ) }}
+
+                    {{ form.minimum_amount.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.minimum_amount(class="form-control") }}
 
                     {{ form.bill_urgency.label(class="form.label",  style="font-weight: normal;") }}
                     {{ form.bill_urgency(class="form-control") }}
@@ -56,7 +59,7 @@
                 <a href="{{ url_for('bills_blueprint.bills_records') }}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
-    </div>
+    <!-- </div> -->
 </div>
 
 {% endblock %}

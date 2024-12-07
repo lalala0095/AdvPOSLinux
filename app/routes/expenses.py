@@ -55,6 +55,7 @@ def expenses_add():
             'description',
             'price',
             'type_of_expense',
+            'platform',
             'store',
             'remarks',
             'payment_method'
@@ -200,6 +201,7 @@ def expenses_edit(record_id):
         platform = form.platform.data
         store = form.store.data
         type_of_expense = form.type_of_expense.data
+        payment_method = form.payment_method.data
         remarks = form.remarks.data
 
         updated_record = {
@@ -212,6 +214,7 @@ def expenses_edit(record_id):
             'type_of_expense': type_of_expense,
             'platform': platform,
             'store': store,
+            'payment_method': payment_method,
             'remarks': remarks,
             'date_updated': datetime.now()
         }

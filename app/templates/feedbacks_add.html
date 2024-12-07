@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="container mt-4 feedbacks-add">
-    <div class="row">
+    <!-- <div class="row"> -->
             <!-- Feedbacks Records Container -->
-        <div class="col-md-6 feedbacks-records">
+        <!-- <div class="col-md-6 feedbacks-records"> -->
             <h5>Feedbacks Records</h5>
             <table class="table table-bordered">
                 <thead class="table-primary">
@@ -35,9 +35,9 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-    <div class="column">
+        <!-- </div> -->
+    <!-- </div> -->
+    <!-- <div class="column"> -->
         <!-- Add Feedback Form Container -->
         <div class="col-md-6 add-new-record">
             <h5 class="mt-5">Add New Feedback</h5>
@@ -66,7 +66,7 @@
                 <a href="{{ url_for('feedbacks_blueprint.feedbacks_records') }}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
-    </div>
+    <!-- </div> -->
 </div>
 
 {% endblock %}

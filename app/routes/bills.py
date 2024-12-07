@@ -4,7 +4,7 @@ from app.config import Config
 from datetime import datetime
 from bson.objectid import ObjectId
 from app.routes.login_required import login_required
-from app.forms.bills import BillForm, CashFlowForm, BillerForm, BillsPlannerForm, populate_biller
+from app.forms.bills import BillForm, CashFlowForm, CashFlowUpdateForm, BillerForm, BillsPlannerForm, populate_biller
 import pandas as pd
 import json
 from app.scripts.log import event_logging
@@ -47,7 +47,13 @@ def billers_add():
     
     form = BillerForm()
 
+    try:
+        amount = float(form.amount.data)
+    except:
+        amount = None
+
     if form.validate_on_submit():
+        print("form validated")
         new_biller = {
             'date_inserted': datetime.now(),
             'user_id': session.get('user_id'),
@@ -55,7 +61,8 @@ def billers_add():
             'biller_name': form.biller_name.data,
             'biller_type': form.biller_type.data,
             'custom_type': form.custom_type.data,
-            'amount': float(form.amount.data),
+            'amount_type': form.amount_type.data,
+            'amount': amount,
             'usual_due_day': form.usual_due_day.data,
             'remarks': form.remarks.data
         }
@@ -73,8 +80,11 @@ def billers_add():
             )
         except Exception as e:
             flash("Biller not inserted. This error has been logged but you may send feedback about the issue.", "danger")
-            flash(form.errors)
-            print(form.errors)
+            error_messages = [msg for messages in form.errors.values() for msg in messages]
+            if error_messages:  
+                flash(f"Error in the response: {' '.join(error_messages)}", "danger")
+                flash("Please correct the errors.", "danger")  
+                print(form.errors)
             event_logging(
                 event_var="adding biller error",
                 user_id=session.get('user_id'),
@@ -85,7 +95,12 @@ def billers_add():
                 error=e
             )
         return redirect(url_for('bills_blueprint.billers_add'))
-
+    else:
+        error_messages = [msg for messages in form.errors.values() for msg in messages]
+        if error_messages:  
+            flash(f"Error in the response: {' '.join(error_messages)}", "danger")
+            flash("Please correct the errors.", "danger")  
+            print(form.errors)
     billers_records = list(db.billers.find({
         "account_id": account_id,
         "user_id": user_id
@@ -230,8 +245,6 @@ def get_amount():
     
     return jsonify({"amount": biller.get('amount')})
 
-
-
 # ----------------
 # cash_flows section
 
@@ -249,6 +262,17 @@ def cash_flows_records():
         "user_id": user_id
     }
     ))
+
+    for i in cash_flows_records:
+        try:
+            i['receiving_date'] = i['receiving_date'].strftime("%b %d, %Y")
+        except:
+            i['receiving_date'] = None
+        try:
+            i['possible_next_month_date'] = i['possible_next_month_date'].strftime("%b %d, %Y")
+        except:
+            i['possible_next_month_date'] = None
+
     return render_template('cash_flows.html', cash_flows_records=cash_flows_records)
 
 #------------
@@ -259,17 +283,14 @@ def cash_flows_add():
     user_id = session.get('user_id')
 
     db = current_app.db
-
-    cash_flows_records = list(db.cash_flows.find({
-        "account_id": account_id,
-        "user_id": user_id
-    }))
     
     form = CashFlowForm()
 
     if form.validate_on_submit():
         usual_income_day = form.usual_income_day.data
-        if usual_income_day >= datetime.today().day:
+        if usual_income_day is None:
+            possible_next_month_date = None
+        elif usual_income_day >= datetime.today().day:
             possible_next_month_date = datetime(
                 year=datetime.today().year,
                 month=datetime.today().month,
@@ -284,6 +305,7 @@ def cash_flows_add():
 
         new_cash_flow = {
             'date_inserted': datetime.now(),
+            'receiving_date': form.receiving_date.data,
             'user_id': session.get('user_id'),
             'account_id': session.get('account_id'),
             'cash_flow_name': form.cash_flow_name.data,
@@ -321,12 +343,22 @@ def cash_flows_add():
             )
         return redirect(url_for('bills_blueprint.cash_flows_add'))
 
+    # Fetch all cash_flows records from the database
     cash_flows_records = list(db.cash_flows.find({
         "account_id": account_id,
         "user_id": user_id
-    }))
+    }
+    ))
+
     for i in cash_flows_records:
-        i['possible_next_month_date'] = pd.to_datetime(i['possible_next_month_date']).strftime("%b %d, %Y") 
+        try:
+            i['receiving_date'] = i['receiving_date'].strftime("%b %d, %Y")
+        except:
+            i['receiving_date'] = None
+        try:
+            i['possible_next_month_date'] = i['possible_next_month_date'].strftime("%b %d, %Y")
+        except:
+            i['possible_next_month_date'] = None
 
     return render_template('cash_flows_add.html', cash_flows_records=cash_flows_records, form=form)
 
@@ -344,6 +376,140 @@ def cash_flows_delete(record_id):
     except Exception as e:
         flash(f"Error deleting record: {e}", "danger")
     return redirect(url_for('bills_blueprint.cash_flows_records'))
+
+@bills_blueprint.route('/cash_flows_edit/<string:record_id>', methods=['GET', 'POST'])
+@login_required
+def cash_flows_edit(record_id):
+    account_id = session.get('account_id')
+    user_id = session.get('user_id')
+
+    db = current_app.db
+    record = db.cash_flows.find_one({"_id": ObjectId(record_id)})
+
+    fields = [
+            'receiving_date',
+            'cash_flow_name',
+            'cash_flow_type',
+            'custom_type',
+            'usual_income_day',
+            'possible_next_month_date',
+            'amount',
+            'remarks'
+        ]
+
+    if not record:
+        flash("Cost of goods record not found!", "danger")
+        return redirect(url_for('bills_blueprint.cash_flows_records'))
+
+    date_inserted = datetime.now()
+    primary_fields = {
+        'date_inserted': date_inserted,
+        'account_id': session.get('account_id'),
+        'user_id': session.get('user_id'),
+        'date_updated': date_inserted            
+    }
+
+    data = {}
+    for field in fields:
+        data[field] = record.get(field)
+
+    data['receiving_date'] = pd.to_datetime(data['receiving_date'], format="%Y-%m-%d")
+
+    primary_fields.update(data)
+    print(primary_fields)
+
+    formdata = MultiDict(primary_fields)
+    form = CashFlowUpdateForm(data=formdata)
+
+    if form.validate_on_submit():
+        if session.get('user_id'):
+            user_id = session['user_id']
+            account_id = session['account_id']
+        else:
+            user_id = None
+            account_id = session['account_id']
+
+        usual_income_day = form.usual_income_day.data
+        if usual_income_day is None:
+            possible_next_month_date = None
+        elif usual_income_day >= datetime.today().day:
+            possible_next_month_date = datetime(
+                year=datetime.today().year,
+                month=datetime.today().month,
+                day=usual_income_day
+                )
+        else:
+            month = datetime.today().month + 1
+            if month > 12:
+                month = 1
+                year = datetime.today().year + 1
+            possible_next_month_date = datetime(
+                year=year,
+                month=month,
+                day=usual_income_day
+                )
+
+        # if request.method == 'POST':
+        date_inserted = record['date_inserted']
+        receiving_date = pd.to_datetime(form.receiving_date.data) 
+        cash_flow_name = form.cash_flow_name.data
+        cash_flow_type = form.cash_flow_type.data
+        custom_type = form.custom_type.data
+        possible_next_month_date = pd.to_datetime(possible_next_month_date)
+        amount = float(form.amount.data)
+        remarks = form.remarks.data
+
+        updated_record = {
+            'date_inserted': date_inserted,
+            'account_id': account_id,
+            'user_id': user_id,
+            'receiving_date': receiving_date,
+            'cash_flow_name': cash_flow_name,
+            'cash_flow_type': cash_flow_type,
+            'custom_type': custom_type,
+            'usual_income_day': usual_income_day,
+            'possible_next_month_date': possible_next_month_date,
+            'amount': amount,
+            'remarks': remarks,
+            'date_updated': datetime.now()
+        }
+
+        try:
+            db.cash_flows.update_one({"_id": ObjectId(record_id)}, {"$set": updated_record})
+            new_doc = db.cash_flows.find_one({"_id": ObjectId(record_id)})
+            event_logging("cash_flows edit", session.get('user_id'), session.get('account_id'), record_id, record, new_doc, None)
+            flash("User record updated successfully!", "success")
+        except Exception as e:
+            new_doc = db.cash_flows.find_one({"_id": ObjectId(record_id)})
+            event_logging("cash_flows edit", session.get('user_id'), session.get('account_id'), record_id, record, new_doc, e)
+            flash(f"Error updating record: {e}", "danger")
+        return redirect(url_for('bills_blueprint.cash_flows_records'))
+
+    # Display errors if validation fails
+    if request.method == 'POST':
+        error_messages = [msg for messages in form.errors.values() for msg in messages]
+        if error_messages:  
+            flash(f"Error in the response: {' '.join(error_messages)}", "danger")
+            flash("Please correct the errors in the form.", "danger")
+
+    # Fetch all cash_flows records from the database
+    cash_flows_records = list(db.cash_flows.find({
+        "account_id": account_id,
+        "user_id": user_id
+    }
+    ))
+
+    for i in cash_flows_records:
+        try:
+            i['receiving_date'] = i['receiving_date'].strftime("%b %d, %Y")
+        except:
+            i['receiving_date'] = None
+        try:
+            i['possible_next_month_date'] = i['possible_next_month_date'].strftime("%b %d, %Y")
+        except:
+            i['possible_next_month_date'] = None
+
+    return render_template('cash_flows_edit.html', form=form, record=record, cash_flows_records=cash_flows_records)
 
 
 
@@ -396,27 +562,26 @@ def bills_planners_add():
 
     db = current_app.db
 
-    initial_bills_db = list(db.bills.find(
+    bills_db = list(db.bills.find(
         {
             "account_id": account_id,
             "user_id": user_id
         }
     ))
-    bills_db = []
-    for i in initial_bills_db:
+    for i in bills_db:
         i['bill_id'] = str(i['_id'])
-        bills_db.append(i)
-    
-    initial_cash_flows_db = list(db.cash_flows.find(
+    cash_flows_db = list(db.cash_flows.find(
         {
             "account_id": account_id,
             "user_id": user_id
         }
     ))
-    cash_flows_db = []
-    for i in initial_cash_flows_db:
+    for i in cash_flows_db:
         i['cash_flow_id'] = str(i['_id'])
-        cash_flows_db.append(i)
+        try:
+            i['receiving_date'] = i['receiving_date'].strftime("%b %d, %Y")
+        except:
+            i['receiving_date'] = ""
 
     form = BillsPlannerForm()
     # form.bills_planner_name.data = "manual name"
@@ -428,6 +593,7 @@ def bills_planners_add():
             planner_count = len(list(db['planners'].find({"account_id": account_id, "user_id": user_id})))
 
             bills_objects = form.bills.data
+            print(bills_objects)
             cash_flows_objects = form.cash_flows.data
 
             total_bills_amount = []

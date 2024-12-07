@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         checkboxes.forEach(checkbox => {
             const cashFlowId = checkbox.dataset.id;
             const amount = parseFloat(checkbox.dataset.amount);
-            const cashFlowName = checkbox.closest('tr').cells[1].textContent;
+            const cashFlowName = checkbox.closest('tr').cells[2].textContent;
         
             // Add new row with cash flow info
             const row = document.createElement('tr');
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         checkboxes.forEach(checkbox => {
             const billId = checkbox.dataset.id;
             const amount = parseFloat(checkbox.dataset.amount);
-            const billName = checkbox.closest('tr').cells[1].textContent;
+            const billName = checkbox.closest('tr').cells[2].textContent;
 
             // Create a new row in the Selected Bills table
             const row = document.createElement('tr');

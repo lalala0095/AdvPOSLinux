@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="container mt-4 billers-add">
-    <div class="row">
+    <!-- <div class="row"> -->
             <!-- Billers Records Container -->
-        <div class="col-md-6 billers-records">
+        <!-- <div class="col-md-6 billers-records"> -->
             <h5>Billers Records</h5>
             <table class="table table-bordered">
                 <thead class="table-primary">
@@ -12,6 +12,7 @@
                         <th>Biller Name</th>
                         <th>Biller Type</th>
                         <th>Custom Type</th>
+                        <th>Amount Type</th>
                         <th>Amount</th>
                         <th>Usual Due Date Day</th>
                         <th>Remarks</th>
@@ -23,6 +24,7 @@
                         <td>{{ record.biller_name }}</td>
                         <td>{{ record.biller_type }}</td>
                         <td>{{ record.custom_type }}</td>
+                        <td>{{ record.amount_type }}</td>
                         <td>{{ record.amount | currency }}</td>
                         <td>{{ record.usual_due_day }}</td>
                         <td>{{ record.remarks }}</td>
@@ -30,9 +32,9 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-    <div class="column">
+        <!-- </div>
+    </div> -->
+    <!-- <div class="column"> -->
         <!-- Add Biller Form Container -->
         <div class="col-md-6 add-new-record">
             <h5 class="mt-5">Add New Biller</h5>
@@ -44,6 +46,9 @@
     
                     {{ form.biller_type.label(class="form.label",  style="font-weight: normal;") }}
                     {{ form.biller_type(class="form-control") }}
+
+                    {{ form.amount_type.label(class="form.label",  style="font-weight: normal;") }}
+                    {{ form.amount_type(class="form-control") }}
 
                     {{ form.amount.label(class="form.label",  style="font-weight: normal;") }}
                     {{ form.amount(class="form-control") }}
@@ -61,7 +66,7 @@
                 <a href="{{ url_for('bills_blueprint.billers_records') }}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
-    </div>
+    <!-- </div>  -->
 </div>
 
 {% endblock %}

@@ -29,12 +29,12 @@ class ExpensesUpdateForm(FlaskForm):
     description = StringField("Items or Description")
     price = FloatField("Price")
     type_of_expense = SelectField("Type", choices=[
-        ('', 'Select an option'),
+        ('', 'Select Type'),
         ("Needs", "Needs"),
         ("Wants", "Wants")
     ], validators=[Optional()])
     platform = SelectField("Platform", choices=[
-        ('', 'Select an option'),
+        ('', 'Select a Platform'),
         ("Shopee", "Shopee"),
         ("Tiktok", "Tiktok"),
         ("Lazada", "Lazada"),

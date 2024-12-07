@@ -22,8 +22,8 @@
                 <label>Balance Left After Bills Payment</label>
                 <input type="text" class="form-control" id="cash-flows-minus-bills" readonly value="₱0.00" style="background-color: rgb(169, 233, 169);"/>
                 
-                <label>Bills Left to Pay</label>
-                <input type="text" class="form-control" id="bills-minus-cash-flows" readonly value="₱0.00" style="background-color: rgb(243, 108, 108);"/>
+                <!-- <label>Bills Left to Pay</label>
+                <input type="text" class="form-control" id="bills-minus-cash-flows" readonly value="₱0.00" style="background-color: rgb(243, 108, 108);"/> -->
 
             </div>
         </div>
@@ -41,6 +41,7 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" id="select-all-bills"> Select All</th>
+                                <th>Due Date</th>
                                 <th>Bill</th>
                                 <th>Amount</th>
                             </tr>
@@ -49,8 +50,9 @@
                             {% for bill in bills_db %}
                             <tr>
                                 <td><input type="checkbox" class="bill-checkbox" data-id="{{ bill['bill_id'] }}" data-amount="{{ bill['amount'] }}"></td>
+                                <td>{{ bill['due_date'].strftime("%b %d, %Y") }}</td>
                                 <td>{{ bill['biller']['biller_name'] }}</td>
-                                <td>₱{{ bill['amount'] }}</td>
+                                <td>{{ bill['amount'] | currency }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -86,6 +88,7 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" id="select-all-cash-flows"> Select All</th>
+                                <th>Receiving Date</th>
                                 <th>Cash Flow Name</th>
                                 <th>Amount</th>
                             </tr>
@@ -94,8 +97,9 @@
                             {% for cash_flow in cash_flows_db %}
                             <tr>
                                 <td><input type="checkbox" class="cash-flow-checkbox" data-id="{{ cash_flow['cash_flow_id'] }}" data-amount="{{ cash_flow['amount'] }}"></td>
+                                <td>{{ cash_flow['receiving_date'] }}</td>
                                 <td>{{ cash_flow['cash_flow_name'] }}</td>
-                                <td>₱{{ cash_flow['amount'] }}</td>
+                                <td>{{ cash_flow['amount'] | currency }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
