@@ -13,6 +13,8 @@ app/*copy*
 app/static/css/style-*
 app/static/js/*scripts *
 my_ec2_server_scripts.md
+docs/advance_features.md
+app/static/img
 
 # Ignore .env file containing sensitive data
 .env
