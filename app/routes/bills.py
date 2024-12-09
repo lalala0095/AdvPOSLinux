@@ -302,10 +302,10 @@ def cash_flows_add():
                 month=datetime.today().month + 1,
                 day=usual_income_day
                 )
-
+        print(type(possible_next_month_date))
         new_cash_flow = {
             'date_inserted': datetime.now(),
-            'receiving_date': form.receiving_date.data,
+            'receiving_date': pd.to_datetime(form.receiving_date.data),
             'user_id': session.get('user_id'),
             'account_id': session.get('account_id'),
             'cash_flow_name': form.cash_flow_name.data,
@@ -478,7 +478,7 @@ def cash_flows_edit(record_id):
             db.cash_flows.update_one({"_id": ObjectId(record_id)}, {"$set": updated_record})
             new_doc = db.cash_flows.find_one({"_id": ObjectId(record_id)})
             event_logging("cash_flows edit", session.get('user_id'), session.get('account_id'), record_id, record, new_doc, None)
-            flash("User record updated successfully!", "success")
+            flash("Cash Flow record updated successfully!", "success")
         except Exception as e:
             new_doc = db.cash_flows.find_one({"_id": ObjectId(record_id)})
             event_logging("cash_flows edit", session.get('user_id'), session.get('account_id'), record_id, record, new_doc, e)

@@ -25,9 +25,9 @@
                 <td>{{ record.date_inserted.strftime("%b %d %Y") }}</td>
                 <td>{{ record.bills_count }}</td>
                 <td>{{ record.cash_flows_count }}</td>
-                <td>{{ record.total_bills_amount }}</td>
-                <td>{{ record.total_cash_flows_amount }}</td>
-                <td>{{ record.bills_minus_cash_flows }}</td>
+                <td>{{ record.total_bills_amount | currency }}</td>
+                <td>{{ record.total_cash_flows_amount | currency }}</td>
+                <td>{{ record.bills_minus_cash_flows | currency }}</td>
                 <td>
                     <!-- Edit Icon -->
                     <a href="{{ url_for('bills_blueprint.bills_planners_view', record_id=record._id) }}" class="btn btn-warning btn-sm">
